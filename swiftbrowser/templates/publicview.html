@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load i18n %}
+{% load dateconv %}
+{% load lastpart %}
+{% block content %}
+
+<div class="container">
+{% include "messages.html" %}
+
+        <ul class="breadcrumb">
+            <li>Containers</li> 
+            <li><span class="divider">/</span>
+                <a class="u" href="{% url "public_objectview" account=account container=container %}">{{container}}</a></li>
+
+            {% for prefix in prefixes %}
+                <li>
+                    <span class="divider">/</span>
+                    <a href="{% url "public_objectview" account=account container=container prefix=prefix.full_name %}">{{prefix.display_name}}</a>
+                </li>
+            {% endfor %}
+       </ul> 
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        
+          <p>To download all objects using wget:</p>
+                  <p><code>wget -r -H -N --no-check-certificate --cut-directories=3 --include-dirs=/v1/ {{base_url}}{% url "public_objectview" account=account container=container %}</code></p>
+        </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th style="width: 0.5em;" class="hidden-phone"></th>
+            <th>{% trans 'Name' %}</th>
+            <th style="width: 12.5em;" class="hidden-phone">{% trans 'Created' %}</th>
+            <th style="width: 6em;" class="hidden-phone">{% trans 'Size' %}</th>
+        </tr>
+        </thead>
+        {% if folders or objects %} 
+        <tbody>
+        {% for folder in folders %}
+            <tr>
+                <td class="hidden-phone"><i class="icon-inbox"></i></td>
+                <td> 
+                    <a href="{% url "public_objectview" account=account container=container prefix=folder.0 %}"><strong>{{folder.0|lastpart}}</strong></a>
+                </td>
+                <td class="hidden-phone"></td>
+                <td class="hidden-phone"></td>
+            </tr>
+        {% endfor %}
+
+        {% for key in objects %}
+            <tr>
+                <td class="hidden-phone"><i class="icon-file"></i></td>
+                <td><a href="{{storage_url}}/{{container}}/{{key.name}}" class="block">{{key.name|lastpart}}</a></td>
+                <td class="hidden-phone">{{key.last_modified|dateconv|date:"SHORT_DATETIME_FORMAT"}}</td>
+	            <td class="hidden-phone">{{key.bytes|filesizeformat}}</td>
+            </tr>
+
+        {% endfor %}
+        </tbody> 
+        {% else %}
+        <tbody>
+            <tr>
+                <th colspan="5" class="center">
+                    <strong><center>{% trans 'There are no objects in this container.' %}<center></strong>
+                </th>
+            </tr>
+        </tbody>
+        {% endif %}
+        <tfoot><tr><td colspan="5"></td></tr></tfoot>
+    </table>
+</div>
+{% endblock %}
+    {% block jsadd %} <script type="text/javascript"> $('input[id=file]').change(function() { $('#filetmp').val($(this).val()); }); </script> {% endblock %}
+

@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Swiftbrowser</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+        <style>
+            body { padding-top: 60px; padding-bottom: 40px; }
+            .center, th.center, td.center {text-align: center;}
+            form {margin-bottom: 0;}
+            td a.block {display: block;}
+            .breadcrumb a {font-weight: bold;}
+            code {white-space: normal !important;}
+        </style>
+        <link href="{% static "bootstrap/css/bootstrap-responsive.min.css" %}" rel="stylesheet">
+        {% block cssadd %}{% endblock %}
+    </head>
+
+    <body>
+        {% block head %}{% endblock %}
+        {% block content %}{% endblock %}
+        {% block footer %}{% endblock %}
+        <script src="{% static "jquery.min.js" %}"></script>
+        <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+        {% block jsadd %}{% endblock %}
+    </body>
+</html>

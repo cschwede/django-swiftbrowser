@@ -1,0 +1,41 @@
+{% load i18n %}
+<div id="upload_modal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="upload_modalLabel" aria-hidden="true">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+<h3 id="upload_modalLabel">{% trans 'Upload object into container ' %}{{container}}</h3>
+</div>
+
+{% if prefix %}
+<form action="{% url "upload" container=container prefix=prefix %}" method="POST" enctype="multipart/form-data" class="form-hoizontal">
+{% else %}
+<form action="{% url "upload" container=container %}" method="POST" enctype="multipart/form-data" class="form-hoizontal">
+{% endif %}
+
+{% csrf_token %}
+<div class="modal-body">
+<input id="file" name="file" type="file" style="display:none;" >
+<div class="input-append">
+<input id="filetmp" name="filetmp" class="input-xlarge" type="text" placeholder="Select a file">
+<a class="btn" onclick="$('input[id=file]').click();">{% trans 'Browse' %}</a>
+</div>
+
+<br />
+
+<input id="filename" name="filename" class="input-xlarge" type="text" placeholder="Filename">
+<span class="help-block">
+<p>{% trans 'Leave empty if you want to use the original name.' %}</p>
+</span>
+
+<span class="help-block">
+<p>{% trans 'If you want to create a new pseudofolder just enter a filename without selecting a file.' %}</p>
+</span>
+
+
+</div>
+
+<div class="modal-footer">
+<button type="submit" class="btn btn-primary">{% trans 'Upload' %}</button>
+<button class="btn" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</button>
+</div>
+</form>
+</div>

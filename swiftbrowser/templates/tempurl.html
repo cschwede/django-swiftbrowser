@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load i18n %}
+{% load dateconv %}
+{% load lastpart %}
+{% block content %}
+
+<div class="container">
+{% include "messages.html" %}
+
+        <ul class="breadcrumb">
+            <li><a href="{% url "containerview" %}">Containers</a></li> 
+            <li><span class="divider">/</span>
+                <a class="u" href="{% url "objectview" container=container %}">{{container}}</a></li>
+
+            {% for prefix in prefixes %}
+                <li>
+                    <span class="divider">/</span>
+                    <a href="{% url "objectview" container=container prefix=prefix.full_name %}">{{prefix.display_name}}</a>
+                </li>
+            {% endfor %}
+       </ul> 
+
+    <fieldset>
+    <legend>{% trans 'Temporary URL for' %} {{container}}/{{objectname}}</legend>
+    <p>{% trans 'Use the following URL to share this object. The URL is valid for 7 days.' %}</p>
+    <p><code>{{url}}</code></p>
+    <p>{% trans 'Please note that you cannot revoke this URL. It is valid until expiration!' %}</p>
+
+
+            {% if prefix %}
+        <a href="{% url "objectview" container=container prefix=prefix %}" class="btn" >
+    {% else %}
+        <a href="{% url "objectview" container=container %}" class="btn" >
+    {% endif %}
+    {% trans 'Back' %}</a>
+  </fieldset>
+</div>
+
+{% endblock %}
+
+
+

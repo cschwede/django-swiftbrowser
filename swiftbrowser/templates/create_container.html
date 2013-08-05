@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load i18n %}
+{% load dateconv %}
+{% load lastpart %}
+{% block content %}
+
+<div class="container">
+{% include "messages.html" %}
+
+        <ul class="breadcrumb">
+            <li><a href="{% url "containerview" %}">Containers</a></li> 
+       </ul> 
+
+<form method="POST" action="{% url "create_container" %}" class="form-horizontal">
+    <fieldset>
+    <legend>{% trans 'Create a new container' %}</legend>
+    {% csrf_token %}
+  
+    <div class="control-group">
+        <label class="control-label" for="foldername">{% trans "Containername" %}</label>
+        <div class="controls">
+            <input id="containername" name="containername" class="input-xlarge" type="text" placeholder="{% trans "Containername" %}">
+            <span class="help-block">
+                {% trans "Enter name of container here." %}
+                {% trans "Please note that you can not rename it afterwards." %}
+            </span>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn btn-primary">{% trans 'Create' %}</button>
+        <a href="{% url "containerview" %}" class="btn" >{% trans 'Cancel' %}</a>
+         </div>
+    </div>
+  </fieldset>
+</form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "core.html" %}
+{% load i18n %}
+    {% block head %}
+    <div class="navbar navbar-inver navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand" href="{% url "containerview" %}">Swiftbrowser</a>
+                    <ul class="nav pull-right">
+                    {% if session.username %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <strong class="hidden-phone">{{session.username}}</strong>
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% include "menuentry_password.html" %}
+                                <li>
+                                    <a href="{% url "login" %}">
+                                    <i class="icon-remove-sign"></i>
+                                    {% trans 'Logout' %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url "login" %}">
+                                <strong> {% trans 'Login' %}</strong>
+                            </a>
+                            </li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <noscript>
+            <div class="container">
+                    <div class="alert alert-error">
+                        <button type="button" class="close" data-dismiss="alert">
+                            &times;
+                        </button>
+                        <strong>{% trans 'Warning!' %}</strong>
+                        {% trans 'You need JavaScript enabled to use all functions on this site.' %}
+                    </div>
+            </div>
+        </noscript>
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}

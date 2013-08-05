@@ -1,0 +1,18 @@
+{% load i18n %}
+{% if messages %}
+    {% for message in messages %}
+        {% if message.level == 20 %}
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>{% trans 'Success.' %}</strong> {{message|safe}}
+            </div>
+        {% endif %}
+
+        {% if message.level == 40 %}
+            <div class="alert alert-error">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>{% trans 'Warning!' %}</strong> {{message|safe}}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}

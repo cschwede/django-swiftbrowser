@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block cssadd %}
+    <style type="text/css">
+        html, body {background: #efefef;}
+        .modal-header {display: none;}
+        @media (min-height: 500px) { 
+            .modal-header {display: block;}
+            form {
+                max-width: 450px;
+                margin: 20px auto 20px;
+                margin-top: 150px;
+                padding:0;
+                background-color: #fff;
+                border: 1px solid #999;
+                border: 1px solid rgba(0, 0, 0, 0.3);
+                *border: 1px solid #999;
+                -webkit-border-radius: 6px;
+                -moz-border-radius: 6px;
+                border-radius: 6px;
+                -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+                -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+                -webkit-background-clip: padding-box;
+                -moz-background-clip: padding-box;
+                background-clip: padding-box;
+            }
+        } 
+        h3 {text-align:center;}
+    </style>
+{% endblock %}
+ 
+{% block content %}
+<form method="post" action="{% url "login" %}">
+    {% csrf_token %}
+    <div class="modal-header"><h3>Login</h3></div>
+    <div class="modal-body">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.level == 40 %}
+                    <div class="alert alert-error">
+                        {{message|safe}}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <fieldset>
+            <label><b>{% trans 'Username' %}</b></label>
+            <input class="focused input-block-level input-small"  name="username" type="text" placeholder="{% trans 'Username' %}">
+            <label><b>{% trans 'Password' %}</b></label>
+            <input class="focused input-block-level" name="password" type="password" placeholder="{% trans 'Passwort' %}">
+        </fieldset>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">{% trans 'Login' %} <span class="icon-chevron-right icon-white"></span></button>
+    </div>
+</form>
+{% endblock %}
+
