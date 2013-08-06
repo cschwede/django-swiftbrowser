@@ -40,6 +40,6 @@ Quick Install
 Screenshots
 -----------
 
-![Login screen](/cschwede(django-swiftbrowser/screenshots/00.png)
-![Container view](/cschwede(django-swiftbrowser/screenshots/01.png)
-![Object view](/cschwede(django-swiftbrowser/screenshots/02.png)
+![Login screen](screenshots/00.png)
+![Container view](screenshots/01.png)
+![Object view](screenshots/02.png)
