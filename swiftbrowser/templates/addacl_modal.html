@@ -1,0 +1,28 @@
+<div id="addacl_modal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="addacl_modalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="addacl_modalLabel">Add ACL for container {{container}}</h3>
+    </div>
+    
+    <form method="POST" action="{% url "edit_acl" container=container %}" class="form-inl"> 
+        {% csrf_token %}
+        <div class="modal-body">
+            <input class="focused"  name="username" type="text" placeholder="Accountname:Username">
+            <span class="help-block">
+                <p>Please note that you have to enter the name in the format "Accountname:Username".</p>
+            </span>
+
+            <label class="checkbox">
+                <input type="checkbox" name="read" >Read
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" name="write" >Write
+            </label>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Add ACL</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        </div>
+    </form>
+</div>

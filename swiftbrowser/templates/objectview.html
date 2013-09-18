@@ -64,18 +64,6 @@
                         <i class="icon-folder-open"></i> Create pseudofolder
                         </a>
                     </li>
-                    <li class="divider" />
-                    <li>
-                        {% if public %}
-                        <a href="{% url "toggle_public" container=container %}">
-                            <i class="icon-eye-close"></i> Make private
-                        </a>
-                        {% else %}
-                        <a href="{% url "toggle_public" container=container %}">
-                            <i class="icon-eye-open"></i> Make public
-                        </a>
-                        {% endif %}
-                    </li>
                 </ul>
                 </div>
             </th>

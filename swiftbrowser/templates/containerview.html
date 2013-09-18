@@ -18,7 +18,11 @@
                 <th style="width: 1em;" class="hidden-phone">{% trans 'Objects' %}</th>
                 <th style="width: 5em;" class="hidden-phone">{% trans 'Size' %}</th>
                 <th style="width: 1em;">
-                <a href="{% url "create_container" %}" class="btn btn-mini btn-danger"><i class="icon-plus icon-white"></i></a>
+
+                <a href="{% url "create_container" %}" class="btn btn-mini btn-danger">
+                    <i class="icon-plus icon-white"></i> 
+                </a>
+
                 </th>
             </tr>
         </thead>
@@ -29,11 +33,26 @@
             <td><strong><a href="{% url "objectview" container=container.name %}" class="block">{{container.name}}</a></strong></td>
     	    <td class="hidden-phone">{{container.count}}</td>
     	    <td class="hidden-phone">{{container.bytes|filesizeformat}}</td>
-            <td> 
-                <a href="{% url "delete_container" container=container.name %}" class="btn btn-mini btn-danger" onclick="return confirm('{% trans 'Delete container?' %}');">
-                    <i class="icon-white icon-trash"></i> 
-                </a>
+
+            <td>
+                <div class="dropdown pull-right">
+                    <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
+                    <ul class="dropdown-menu">
+                        {% url "edit_acl" container=container.name as edit_acl_url %}
+                        {% if edit_acl_url %}
+                            <li><a href="{{ edit_acl_url }}"><i class="icon-user"></i> {% trans 'Sharing' %}</a></li>
+                            <li class="divider" />
+                        {% endif %}
+ 
+                        <li>
+                            <a href="{% url "containerview" %}?delete={{ container.name }}" onclick="return confirm('{% trans 'Delete container' %} {{container.name}}?');">
+                                <i class="icon-trash"></i> {% trans 'Delete container' %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </td>
+
             </tr> 
 
         {% empty %}

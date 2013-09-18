@@ -285,3 +285,18 @@ class MockTest(TestCase):
                                                 'prefix': 'prefix'}),
                                         {'foldername':'test2'})
         self.assertEqual(resp.status_code, 302)
+
+    def test_edit_acl(self):
+        swiftclient.client.head_container = mock.Mock(return_value={})
+
+        swiftclient.client.post_container = mock.Mock()
+
+        resp = self.client.post(reverse('edit_acl', kwargs={'container': 'container'}),
+                                {'username': 'testuser',
+                                 'read': 'On',
+                                 'write': 'On'})
+        self.assertEqual(resp.status_code, 200)
+        swiftclient.client.post_container.assert_called_with('', '',
+            'container', {'X-Container-Read': ',testuser',
+                          'X-Container-Write': ',testuser'})
+  

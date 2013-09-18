@@ -17,13 +17,12 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from swiftbrowser.forms import CreateContainerForm, PseudoFolderForm, \
-                               LoginForm
+                               LoginForm, AddACLForm
 from swiftbrowser.utils import replace_hyphens, prefix_list, \
                                pseudofolder_object_list, get_temp_key,\
                                get_base_url, get_temp_url
 
 import swiftbrowser
-
 
 def login(request):
     """ Tries to login user and sets session data """
@@ -348,3 +347,125 @@ def create_pseudofolder(request, container, prefix=None):
                               'container': container,
                               'prefix': prefix,
                               }, context_instance=RequestContext(request))
+
+
+def get_acls(storage_url, auth_token, container):
+    """ Returns ACLs of given container. """
+    cont = client.head_container(storage_url, auth_token, container)
+    readers = cont.get('x-container-read', '')
+    writers = cont.get('x-container-write', '')
+    return (readers, writers)
+
+
+def remove_duplicates_from_acl(acls):
+    """ Removes possible duplicates from a comma-separated list. """
+    entries = acls.split(',')
+    cleaned_entries = list(set(entries))
+    acls = ','.join(cleaned_entries)
+    return acls
+
+
+def edit_acl(request, container):
+    """ Edit ACLs on given container. """
+
+    storage_url = request.session.get('storage_url', '')
+    auth_token = request.session.get('auth_token', '')
+
+    if request.method == 'POST':
+        form = AddACLForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+
+            try:
+                (readers, writers) = get_acls(storage_url,
+                    auth_token, container)
+            except KeyError:
+                return redirect(logout)
+
+            readers = remove_duplicates_from_acl(readers)
+            writers = remove_duplicates_from_acl(writers)
+
+            if form.cleaned_data['read']:
+                readers += ",%s" % username
+
+            if form.cleaned_data['write']:
+                writers += ",%s" % username
+
+            headers = {'X-Container-Read': readers,
+                       'X-Container-Write': writers}
+            try:
+                client.post_container(storage_url,
+                    auth_token, container, headers)
+                message = "ACLs updated."
+                messages.add_message(request, messages.INFO, message)
+            except client.ClientException:
+                message = "ACL update failed"
+                messages.add_message(request, messages.ERROR, message)
+
+
+    if request.method == 'GET':
+        delete = request.GET.get('delete', None)
+        if delete:
+            users = delete.split(',')
+
+            (readers, writers) = get_acls(storage_url, auth_token, container)
+
+            new_readers = ""
+            for element in readers.split(','):
+                if element not in users:
+                    new_readers += element
+                    new_readers += ","
+        
+            new_writers = ""
+            for element in writers.split(','):
+                if element not in users:
+                    new_writers += element
+                    new_writers += ","
+        
+            headers = {'X-Container-Read': new_readers,
+                       'X-Container-Write': new_writers}
+            try:
+                client.post_container(storage_url, auth_token,
+                                      container, headers)
+                message = "ACL removed."
+                messages.add_message(request, messages.INFO, message)
+            except client.ClientException:
+                message = "ACL update failed."
+                messages.add_message(request, messages.ERROR, message)
+
+    (readers, writers) = get_acls(storage_url, auth_token, container)
+
+    acls = {}
+
+    if readers != "":
+        readers = remove_duplicates_from_acl(readers)
+        for entry in readers.split(','):
+            acls[entry] = {}
+            acls[entry]['read'] = True
+            acls[entry]['write'] = False
+
+    if writers != "":
+        writers = remove_duplicates_from_acl(writers)
+        for entry in writers.split(','):
+            if entry not in acls:
+                acls[entry] = {}
+                acls[entry]['read'] = False
+            acls[entry]['write'] = True
+
+    public = False
+    if acls.get('.r:*', False) and acls.get('.rlistings', False):
+        public = True
+
+    if request.is_secure():
+        base_url = "https://%s" % request.get_host()
+    else:
+        base_url = "http://%s" % request.get_host()
+
+    return render_to_response('edit_acl.html', {
+        'container': container,
+        'account': storage_url.split('/')[-1],
+        'session': request.session,
+        'acls': acls,
+        'public': public,
+        'base_url': base_url,
+    }, context_instance=RequestContext(request))
