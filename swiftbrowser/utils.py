@@ -19,6 +19,8 @@ from django.conf import settings
 
 
 def get_base_url(request):
+    if settings.BASE_URL:
+        return settings.BASE_URL
     if request.is_secure():
         base_url = "https://%s" % request.get_host()
     else:
