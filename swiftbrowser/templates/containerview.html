@@ -45,7 +45,7 @@
                         {% endif %}
  
                         <li>
-                            <a href="{% url "containerview" %}?delete={{ container.name }}" onclick="return confirm('{% trans 'Delete container' %} {{container.name}}?');">
+                            <a href="{% url "delete_container" container=container.name %}" onclick="return confirm('{% trans 'Delete container' %} {{container.name}}?');">
                                 <i class="icon-trash"></i> {% trans 'Delete container' %}
                             </a>
                         </li>
