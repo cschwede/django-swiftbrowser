@@ -1,9 +1,18 @@
 """ Settings for Django project """
 import os
 
-DATABASES = { }
+# The database isn't used, but Django might complain if setting missing
+DATABASES = { 
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'swiftbrowser.db'
+    }   
+}
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
+USE_L10N = True
+USE_TZ = True
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -11,7 +20,7 @@ TEMPLATE_LOADERS = (
 )
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-TEMPLATE_DIRS = (os.path.join(PROJECT_PATH, 'templates'), )
+TEMPLATE_DIRS = ( os.path.join(PROJECT_PATH, 'templates'),)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -21,31 +30,25 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 )
 
-ROOT_URLCONF = 'swiftbrowser.urls'
+ROOT_URLCONF = 'myproj.urls'
 
 INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'swiftbrowser', 
+    'swiftbrowser_swauth', 
 )
-
-
-# Adapt the following settings to your needs
-
-
-DEBUG = True
-USE_L10N = True
-USE_TZ = True
-
 
 SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'
 STORAGE_URL = 'http://127.0.0.1:8080/v1/'
+BASE_URL = 'http://127.0.0.1'
+SWAUTH_URL = 'http://127.0.0.1:8080/auth/v2'
+STATIC_DIR = '/var/www/myproj/static'
 
-SECRET_KEY = "DONT_USE_THIS_IN_PRODUCTION"
+TIME_ZONE = 'Europe/Berlin'
+LANGUAGE_CODE = 'de-de'
+SECRET_KEY = 'DONT_USE_THIS_IN_PRODUCTION'
 STATIC_URL = "/static/"
-STATIC_ROOT = "/home/cschwede/myproj/static/"
+STATIC_ROOT = "/var/www/myproj/static/"
 
-try:
-    from local_settings import *
-except ImportError:
-    pass
+ALLOWED_HOSTS = ['127.0.0.1', 'insert_your_hostname_here']
