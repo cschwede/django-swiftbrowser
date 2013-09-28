@@ -9,6 +9,7 @@ env:
 install:
  - pip install -q Django==$DJANGO --use-mirrors
  - pip install -q . --use-mirrors
+ - pip install python-swiftclient
 
 script: python setup.py test
 
