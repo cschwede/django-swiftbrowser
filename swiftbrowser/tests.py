@@ -51,12 +51,18 @@ class MockTest(TestCase):
         self.assertEqual(resp['Location'], 'http://testserver/')
 
     def test_delete_container(self):
-        swiftclient.client.delete_container = mock.Mock(
-            side_effect=swiftclient.client.ClientException(''))
+        objects = [{'name': 'obj1'}, {'name': 'obj2'}]
+        swiftclient.client.get_container = mock.Mock(return_value=({}, objects))
+
+        swiftclient.client.delete_container = mock.Mock()
         resp = self.client.post(reverse('delete_container',
                                 kwargs={'container': 'container'}))
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp['Location'], 'http://testserver/')
+
+        expected = [mock.call('', '', 'container', 'obj1'),
+                    mock.call('', '', 'container', 'obj2')]
+        swiftclient.client.delete_object.call_args_list == expected
 
         swiftclient.client.delete_container = mock.Mock()
  

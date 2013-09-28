@@ -95,6 +95,9 @@ def delete_container(request, container):
     auth_token = request.session.get('auth_token', '')
 
     try:
+        _meta, objects = client.get_container(storage_url, auth_token, container)
+        for obj in objects:
+            client.delete_object(storage_url, auth_token, container, obj['name'])
         client.delete_container(storage_url, auth_token, container)
         messages.add_message(request, messages.INFO, _("Container deleted."))
     except client.ClientException:
