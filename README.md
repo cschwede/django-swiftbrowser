@@ -1,6 +1,8 @@
 django-swiftbrowser
 ===================
 
+[![Build Status](https://travis-ci.org/cschwede/django-swiftbrowser.png?branch=master)](https://travis-ci.org/cschwede/django-swiftbrowser)
+
 Simple web app build with Django and Twitter Bootstrap to access Openstack Swift.
 
 * No database needed
