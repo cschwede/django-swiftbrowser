@@ -31,7 +31,7 @@ def get_base_url(request):
 
 def replace_hyphens(olddict):
     """ Replaces all hyphens in dict keys with an underscore.
-    
+
     Needed in Django templates to get a value from a dict by key name. """
     newdict = {}
     for key, value in olddict.items():
@@ -66,7 +66,7 @@ def pseudofolder_object_list(objects, prefix):
         if obj.get('content_type', None) in ('application/directory',
                                              'application/x-directory'):
             obj['subdir'] = obj['name']
-        
+
         if 'subdir' in obj:
             # make sure that there is a single slash at the end
             # Cyberduck appends a slash to the name of a pseudofolder
@@ -78,7 +78,7 @@ def pseudofolder_object_list(objects, prefix):
             objs.append(obj)
 
     return (pseudofolders, objs)
- 
+
 
 def get_temp_key(storage_url, auth_token):
     """ Tries to get meta-temp-url key from account.
@@ -89,9 +89,9 @@ def get_temp_key(storage_url, auth_token):
         account = client.get_account(storage_url, auth_token)
     except client.ClientException:
         return None
-    
+
     key = account[0].get('x-account-meta-temp-url-key')
-    
+
     if not key:
         chars = string.ascii_lowercase + string.digits
         key = ''.join(random.choice(chars) for x in range(32))
@@ -115,5 +115,5 @@ def get_temp_url(storage_url, auth_token, container, objectname, expires=600):
     hmac_body = 'GET\n%s\n%s' % (expires, path)
     sig = hmac.new(key, hmac_body, sha1).hexdigest()
     url = '%s%s?temp_url_sig=%s&temp_url_expires=%s' % (
-        base, path, sig, expires)   
+        base, path, sig, expires)
     return url

@@ -24,6 +24,7 @@ from swiftbrowser.utils import replace_hyphens, prefix_list, \
 
 import swiftbrowser
 
+
 def login(request):
     """ Tries to login user and sets session data """
     request.session.flush()
@@ -81,7 +82,7 @@ def create_container(request):
                                  _("Container created."))
         except client.ClientException:
             messages.add_message(request, messages.ERROR, _("Access denied."))
-    
+
         return redirect(containerview)
 
     return render_to_response('create_container.html', {
@@ -95,14 +96,15 @@ def delete_container(request, container):
     auth_token = request.session.get('auth_token', '')
 
     try:
-        _meta, objects = client.get_container(storage_url, auth_token, container)
+        _m, objects = client.get_container(storage_url, auth_token, container)
         for obj in objects:
-            client.delete_object(storage_url, auth_token, container, obj['name'])
+            client.delete_object(storage_url, auth_token,
+                                 container, obj['name'])
         client.delete_container(storage_url, auth_token, container)
         messages.add_message(request, messages.INFO, _("Container deleted."))
     except client.ClientException:
         messages.add_message(request, messages.ERROR, _("Access denied."))
-    
+
     return redirect(containerview)
 
 
@@ -111,7 +113,7 @@ def objectview(request, container, prefix=None):
 
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
- 
+
     try:
         meta, objects = client.get_container(storage_url, auth_token,
                                              container, delimiter='/',
@@ -140,7 +142,7 @@ def objectview(request, container, prefix=None):
         'prefix': prefix,
         'prefixes': prefixes,
         'base_url': base_url,
-        'account': account, 
+        'account': account,
         'public': public,
         },
         context_instance=RequestContext(request))
@@ -151,21 +153,21 @@ def upload(request, container, prefix=None):
 
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
-    
+
     redirect_url = get_base_url(request)
     redirect_url += reverse('objectview', kwargs={'container': container, })
-    
+
     swift_url = storage_url + '/' + container + '/'
     if prefix:
         swift_url += prefix
         redirect_url += prefix
-   
+
     url_parts = urlparse.urlparse(swift_url)
     path = url_parts.path
 
-    max_file_size = 5*1024*1024*1024  
+    max_file_size = 5 * 1024 * 1024 * 1024
     max_file_count = 1
-    expires = int(time.time() + 15*60)
+    expires = int(time.time() + 15 * 60)
     key = get_temp_key(storage_url, auth_token)
     if not key:
         messages.add_message(request, messages.ERROR, _("Access denied."))
@@ -173,13 +175,13 @@ def upload(request, container, prefix=None):
             return redirect(objectview, container=container, prefix=prefix)
         else:
             return redirect(objectview, container=container)
-    
+
     hmac_body = '%s\n%s\n%s\n%s\n%s' % (path, redirect_url,
         max_file_size, max_file_count, expires)
     signature = hmac.new(key, hmac_body, sha1).hexdigest()
 
     prefixes = prefix_list(prefix)
-    
+
     return render_to_response('upload_form.html', {
                               'swift_url': swift_url,
                               'redirect_url': redirect_url,
@@ -195,7 +197,7 @@ def upload(request, container, prefix=None):
 
 def download(request, container, objectname):
     """ Download an object from Swift """
-    
+
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
     url = swiftbrowser.utils.get_temp_url(storage_url, auth_token,
@@ -214,11 +216,11 @@ def delete_object(request, container, objectname):
     auth_token = request.session.get('auth_token', '')
     try:
         client.delete_object(storage_url, auth_token, container, objectname)
-        messages.add_message(request, messages.INFO, _("Object deleted.")) 
+        messages.add_message(request, messages.INFO, _("Object deleted."))
     except client.ClientException:
         messages.add_message(request, messages.ERROR, _("Access denied."))
 
-    prefix = '/'.join(objectname.split('/')[:-1]) 
+    prefix = '/'.join(objectname.split('/')[:-1])
     if prefix:
         prefix += '/'
     return redirect(objectview, container=container, prefix=prefix)
@@ -229,7 +231,7 @@ def toggle_public(request, container):
 
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
- 
+
     try:
         meta = client.head_container(storage_url, auth_token, container)
     except client.ClientException:
@@ -251,12 +253,12 @@ def toggle_public(request, container):
         messages.add_message(request, messages.ERROR, _("Access denied."))
 
     return redirect(objectview, container=container)
-    
+
 
 def public_objectview(request, account, container, prefix=None):
     """ Returns list of all objects in current container. """
     storage_url = settings.STORAGE_URL + account
-    auth_token = ' ' 
+    auth_token = ' '
     try:
         _meta, objects = client.get_container(storage_url, auth_token,
                                              container, delimiter='/',
@@ -279,7 +281,7 @@ def public_objectview(request, account, container, prefix=None):
         'prefixes': prefixes,
         'base_url': base_url,
         'storage_url': storage_url,
-        'account': account, 
+        'account': account,
         },
         context_instance=RequestContext(request))
 
@@ -289,18 +291,18 @@ def tempurl(request, container, objectname):
 
     container = unicode(container).encode('utf-8')
     objectname = unicode(objectname).encode('utf-8')
-    
+
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
-        
+
     url = get_temp_url(storage_url, auth_token,
-                       container, objectname, 7*24*3600)
+                       container, objectname, 7 * 24 * 3600)
 
     if not url:
         messages.add_message(request, messages.ERROR, _("Access denied."))
         return redirect(objectview, container=container)
 
-    prefix = '/'.join(objectname.split('/')[:-1]) 
+    prefix = '/'.join(objectname.split('/')[:-1])
     if prefix:
         prefix += '/'
     prefixes = prefix_list(prefix)
@@ -311,7 +313,7 @@ def tempurl(request, container, objectname):
                                'container': container,
                                'prefix': prefix,
                                'prefixes': prefixes,
-                               'objectname': objectname, 
+                               'objectname': objectname,
                                'session': request.session,
                                },
                               context_instance=RequestContext(request))
@@ -341,7 +343,7 @@ def create_pseudofolder(request, container, prefix=None):
                                  _("Pseudofolder created."))
         except client.ClientException:
             messages.add_message(request, messages.ERROR, _("Access denied."))
-    
+
         if prefix:
             return redirect(objectview, container=container, prefix=prefix)
         return redirect(objectview, container=container)
@@ -405,7 +407,6 @@ def edit_acl(request, container):
                 message = "ACL update failed"
                 messages.add_message(request, messages.ERROR, message)
 
-
     if request.method == 'GET':
         delete = request.GET.get('delete', None)
         if delete:
@@ -418,13 +419,13 @@ def edit_acl(request, container):
                 if element not in users:
                     new_readers += element
                     new_readers += ","
-        
+
             new_writers = ""
             for element in writers.split(','):
                 if element not in users:
                     new_writers += element
                     new_writers += ","
-        
+
             headers = {'X-Container-Read': new_readers,
                        'X-Container-Write': new_writers}
             try:
