@@ -36,7 +36,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'swiftbrowser', 
-    'swiftbrowser_swauth', 
 )
 
 SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'
