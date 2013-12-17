@@ -33,8 +33,10 @@ def login(request):
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
         try:
+            auth_version = settings.SWIFT_AUTH_VERSION or 1
             (storage_url, auth_token) = client.get_auth(
-                settings.SWIFT_AUTH_URL, username, password)
+                settings.SWIFT_AUTH_URL, username, password,
+                auth_version=auth_version)
             request.session['auth_token'] = auth_token
             request.session['storage_url'] = storage_url
             request.session['username'] = username

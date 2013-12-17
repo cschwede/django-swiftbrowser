@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 )
 
 SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'
+SWIFT_AUTH_VERSION = 1 # 2 for keystone
 STORAGE_URL = 'http://127.0.0.1:8080/v1/'
 BASE_URL = 'http://127.0.0.1'
 SWAUTH_URL = 'http://127.0.0.1:8080/auth/v2'
