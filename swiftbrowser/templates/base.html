@@ -13,7 +13,7 @@
                                 <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                {% include "menu_addons.html" %}
+                                {% block menu_addons %}{% endblock %}
                                 <li>
                                     <a href="{% url "login" %}">
                                     <i class="icon-remove-sign"></i>
