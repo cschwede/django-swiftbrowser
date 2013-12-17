@@ -26,7 +26,7 @@ Quick Install
 
 2) Create a new Django project:
 
-    django-admin startproject myproj
+    django-admin.py startproject myproj
     cd myproj
     cp ~/django-swiftbrowser/example/settings.py myproj/settings.py
 
@@ -38,7 +38,7 @@ Quick Install
     import swiftbrowser.urls
 
     urlpatterns = patterns('',
-        url(r'^swift/', include(swiftbrowser.urls)),
+        url(r'^', include(swiftbrowser.urls)),
     )
 
 5) Collect static files:
@@ -49,9 +49,11 @@ Quick Install
     
     python manage.py runserver
 
-    Add the option '--insecure' if DEBUG = False and ALLOWED_HOSTS is not changed in myproj/settings.py
+   Add the option '--insecure' if DEBUG = False and ALLOWED_HOSTS is not changed in myproj/settings.py.
 
-7) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
+7) Use 'account:username' to login (or tenant/project:username if using Keystone).
+
+8) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
 
 Screenshots
 -----------
