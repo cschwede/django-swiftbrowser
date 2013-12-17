@@ -18,6 +18,7 @@ setup(
     author='Christian Schwede',
     author_email='info@cschwede.de',
     install_requires=['django>=1.5', 'python-swiftclient'],
+    zip_safe=False,
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',

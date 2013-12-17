@@ -31,13 +31,27 @@ Quick Install
     cp ~/django-swiftbrowser/example/settings.py myproj/settings.py
 
 
-3) Adopt myproj/settings.py to your needs.
+3) Adopt myproj/settings.py to your needs, especially settings for Swift and static file directories.
 
-4) Run development server:
+4) Update myproj/urls.py and include swiftbrowser.urls:
+
+    import swiftbrowser.urls
+
+    urlpatterns = patterns('',
+        url(r'^swift/', include(swiftbrowser.urls)),
+    )
+
+5) Collect static files:
+
+    python manage.py collectstatic
+
+6) Run development server:
     
     python manage.py runserver
 
-5) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
+    Add the option '--insecure' if DEBUG = False and ALLOWED_HOSTS is not changed in myproj/settings.py
+
+7) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
 
 Screenshots
 -----------
