@@ -49,11 +49,24 @@ Quick Install
     
     python manage.py runserver
 
-   Add the option '--insecure' if DEBUG = False and ALLOWED_HOSTS is not changed in myproj/settings.py.
+   *Important*: Either use 'python manage.py runserver --insecure' or set DEBUG = True in myproj/settings.py if you want to use the
+   local development server. Don't use these settings in production!
 
 7) Use 'account:username' to login (or tenant/project:username if using Keystone).
 
 8) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
+
+9) Please make sure that "tempurl" and "formpost" middlewares are activated in your proxy server. Extract from /etc/swift/proxy-server.conf:
+
+    [pipeline:main]
+    pipeline = catch_errors gatekeeper healthcheck proxy-logging cache tempurl formpost tempauth proxy-logging proxy-server
+
+    [filter:tempurl]
+    use = egg:swift#tempurl
+
+    [filter:formpost]
+    use = egg:swift#formpost
+
 
 Screenshots
 -----------
