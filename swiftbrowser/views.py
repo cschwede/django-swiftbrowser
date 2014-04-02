@@ -221,7 +221,8 @@ def delete_object(request, container, objectname):
         messages.add_message(request, messages.INFO, _("Object deleted."))
     except client.ClientException:
         messages.add_message(request, messages.ERROR, _("Access denied."))
-
+    if objectname[-1] == '/':  # deleting a pseudofolder, move one level up
+        objectname = objectname[:-1]
     prefix = '/'.join(objectname.split('/')[:-1])
     if prefix:
         prefix += '/'
@@ -333,6 +334,7 @@ def create_pseudofolder(request, container, prefix=None):
             foldername = prefix + '/' + foldername
         foldername = os.path.normpath(foldername)
         foldername = foldername.strip('/')
+        foldername += '/'
 
         content_type = 'application/directory'
         obj = None

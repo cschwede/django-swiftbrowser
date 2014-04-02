@@ -290,7 +290,7 @@ class MockTest(TestCase):
         self.assertEqual(resp.status_code, 302)
 
         swiftclient.client.put_object.assert_called_with('', '', u'container',
-            u'test', None, content_type='application/directory')
+            u'test/', None, content_type='application/directory')
 
         resp = self.client.post(reverse('create_pseudofolder',
                                         kwargs={'container': 'container',
