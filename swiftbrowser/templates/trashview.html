@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load l10n %}
+{% load i18n %}
+{% load dateconv %}
+{% load lastpart %}
+{% block content %}
+
+<div id='containerdiv' class="container">
+{% include "messages.html" %}
+	{% if objects %}
+      <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>{% trans 'Name' %}</th>
+            <th style="width: 12.5em;" class="hidden-phone">{% trans 'Archived' %}</th>
+            <th style="width: 6em;" class="hidden-phone">{% trans 'Size' %}</th>
+            <th style="width: 1em;">
+        </tr>
+        </thead>
+        
+        <tbody>
+        {% for key in objects %}
+            <tr>
+                <td><a href="" class="block">{{key.name}}</a></td>
+                <td class="hidden-phone">{{key.last_modified|dateconv|date:"SHORT_DATETIME_FORMAT"}}</td>
+	            <td class="hidden-phone">{{key.size|filesizeformat}}</td>
+	            <td>
+	                  <div class="dropdown pull-right">
+                        <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% if key.dir %}{% url "restore_trash_collection" account=account trashname=key.name %}{% else %}{% url "restore_trash" account=account trashname=key.name %}{% endif %}">
+                            <i class="icon-share-alt"></i> {% trans 'Restore' %}</a></li>
+                            <li><a href="{% url "delete_trash" account=account trashname=key.name %}"><i class="icon-fire"></i> {% trans 'Delete' %}</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        
+        <tfoot><tr><td colspan="5"></td></tr></tfoot>
+    </table>
+    {% else %}
+    <strong>{% trans 'Trash is empty.' %}</strong>
+    {% endif %}
+    
+</div>
+{% endblock %}

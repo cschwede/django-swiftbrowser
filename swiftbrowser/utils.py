@@ -87,6 +87,15 @@ def pseudofolder_object_list(objects, prefix):
     return (pseudofolders, objs)
 
 
+def redirect_to_objectview_after_delete(objectname, container):
+    if objectname[-1] == '/':  # deleting a pseudofolder, move one level up
+            objectname = objectname[:-1]
+    prefix = '/'.join(objectname.split('/')[:-1])
+    if prefix:
+        prefix += '/'
+    return redirect("objectview", container=container, prefix=prefix)
+    
+    
 def get_original_account(storage_url, auth_token, container):
     try:
         headers = client.head_container(storage_url, auth_token, container)
@@ -104,7 +113,30 @@ def get_original_account(storage_url, auth_token, container):
 
     return (account, original_container_name)
     
+
+def create_pseudofolder_from_prefix(storage_url, auth_token, container,
+                                    prefix, prefixlist):
+    #Recursively creates pseudofolders from a given prefix, if the
+    #prefix is not included in the prefixlist
+    subprefix = '/'.join(prefix.split('/')[0:-1])
+    if subprefix == '' or prefix in prefixlist:
+        return prefixlist
+
+    prefixlist = create_pseudofolder_from_prefix(storage_url, auth_token,
+                                                 container, subprefix,
+                                                 prefixlist)
+
+    content_type = 'application/directory'
+    obj = None
+
+    client.put_object(storage_url, auth_token,
+                          container, prefix + '/', obj,
+                          content_type=content_type)
+    prefixlist.append(prefix)
+
+    return prefixlist
     
+        
 def get_temp_key(storage_url, auth_token):
     """ Tries to get meta-temp-url key from account.
     If not set, generate tempurl and save it to acocunt.

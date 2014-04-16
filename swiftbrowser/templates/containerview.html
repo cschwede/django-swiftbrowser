@@ -46,8 +46,12 @@
  
                         <li>
                             <a href="{% url "delete_container" container=container.name %}" onclick="return confirm('{% trans 'Delete container' %} {{container.name}}?');">
-                                <i class="icon-trash"></i> {% trans 'Delete container' %}
+                                <i class="icon-fire"></i> {% trans 'Delete container' %}
                             </a>
+                        </li>
+                        <li>
+                        	<a href="{% url "move_collection_to_trash" container=container.name  %}"  ><i class="icon-trash"></i> {% trans 'Move to trash' %}
+                        	</a>
                         </li>
                     </ul>
                 </div>
@@ -67,6 +71,7 @@
        
         <tfoot>
             <tr>
+                <td><a href="{% url "trashview" account=account %}" role="button" class="btn btn-mini"><i class="icon-trash"></i></a></td>
                 <th colspan="5" class="center">
                     {{account_stat.x_account_bytes_used|filesizeformat}} 
                     {% if account_stat.x_account_meta_quota_bytes %}

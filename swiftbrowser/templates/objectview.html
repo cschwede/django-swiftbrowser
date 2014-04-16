@@ -80,9 +80,15 @@
                 <td class="hidden-phone"></td>
                 <td class="hidden-phone"></td>
 
-                    <td>
-                    <a href="{% url "delete_object" container=container objectname=folder.1 %}" class="btn btn-mini btn-danger" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-trash icon-white"></i></a>
-                    </td>
+                <td>
+                    <div class="dropdown pull-right">
+                        <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url "delete_object" container=container objectname=folder.1  %}" onclick="return confirm('{% trans 'Delete folder' %} {{folder.1}}?');" ><i class="icon-fire"></i> {% trans 'Delete folder' %}</a></li>
+                            <li><a href="{% url "move_collection_to_trash" container=container prefix=folder.1  %}"  ><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
+                        </ul>
+                    </div>
+                </td>
             </tr>
         {% endfor %}
 
@@ -99,7 +105,8 @@
                         <ul class="dropdown-menu">
                             <li><a href="{% url "tempurl" container=container objectname=key.name %}"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
                             <li class="divider" />
-                            <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-trash"></i> Delete object</a></li>
+                            <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-fire"></i> {% trans 'Delete Object' %}</a></li>
+                            <li><a href="{% url "move_to_trash" container=container objectname=key.name  %}"><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
                         </ul>
                     </div>
                 </td>
@@ -116,7 +123,8 @@
             </tr>
         </tbody>
         {% endif %}
-        <tfoot><tr><td colspan="5"></td></tr></tfoot>
+        <tfoot><tr><td><a href="{% url "trashview" account=account %}" role="button" class="btn btn-mini"><i class="icon-trash"></i></a></td>
+        <td colspan="5"></td></tr></tfoot>
     </table>
 </div>
 {% endblock %}
