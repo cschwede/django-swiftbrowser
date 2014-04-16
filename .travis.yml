@@ -8,8 +8,9 @@ env:
 
 install:
  - pip install -q Django==$DJANGO --use-mirrors
- - pip install -q . --use-mirrors
  - pip install python-swiftclient
+ - pip install git+git://github.com/bors-ltd/django-icons-mimetypes.git#egg=django-icons-mimetypes
+ - pip install Pillow
 
 script: python runtests.py
 
