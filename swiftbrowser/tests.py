@@ -278,18 +278,17 @@ class MockTest(TestCase):
         swiftclient.client.get_account = mock.Mock(
             side_effect=swiftclient.client.ClientException(''))
         response = self.client.get(reverse('tempurl', args=['c', 'o']))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 403)
 
         account = [{'x-account-meta-temp-url-key': 'dummy'}, ]
         swiftclient.client.get_account = mock.Mock(return_value=(account))
-
         response = self.client.get(reverse('tempurl', args=['c', 'o']))
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(reverse('tempurl', args=['ü', 'ö']))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['container'], 'ü')
-        self.assertEqual(response.context['objectname'], 'ö')
+        with mock.patch('swiftbrowser.views.get_temp_url',
+                         mock.Mock(return_value='http://url')):
+            resp = self.client.get(reverse('tempurl', args=['c', 'o']))
+            self.assertEqual(resp.content, 'http://url')
 
     def test_create_pseudofolder(self):
         swiftclient.client.put_object = mock.Mock(

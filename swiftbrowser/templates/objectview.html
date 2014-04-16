@@ -5,7 +5,7 @@
 {% load lastpart %}
 {% block content %}
 
-<div class="container">
+<div id='containerdiv' class="container">
 {% include "messages.html" %}
 
         <ul class="breadcrumb">
@@ -84,7 +84,7 @@
                     <div class="dropdown pull-right">
                         <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{% url "download_collection" container=container prefix=folder.0 %}"><i class="icon-download"></i> {% trans 'Download' %}</a></li>
+                                <li><a href="{% url "download_collection" container=container prefix=folder.0 %}"><i class="icon-download"></i> {% trans 'Download' %}</a></li>
                             <li><a href="{% url "download_collection_nonrec" container=container prefix=folder.0  %}"><i class="icon-download"></i> {% trans 'Download nonrecursive' %}</a></li>
                             <li class="divider" />
                             <li><a href="{% url "delete_object" container=container objectname=folder.1  %}" onclick="return confirm('{% trans 'Delete folder' %} {{folder.1}}?');" ><i class="icon-fire"></i> {% trans 'Delete folder' %}</a></li>
@@ -106,7 +106,7 @@
                     <div class="dropdown pull-right">
                         <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{% url "tempurl" container=container objectname=key.name %}"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
+                            <li><a href="{% url "tempurl" container=container objectname=key.name %}" id="tempurllink"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
                             <li class="divider" />
                             <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-fire"></i> {% trans 'Delete Object' %}</a></li>
                             <li><a href="{% url "move_to_trash" container=container objectname=key.name  %}"><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
@@ -131,5 +131,32 @@
     </table>
 </div>
 {% endblock %}
-    {% block jsadd %} <script type="text/javascript"> $('input[id=file]').change(function() { $('#filetmp').val($(this).val()); }); </script> {% endblock %}
+{% block jsadd %} 
+<script type="text/javascript"> $('input[id=file]').change(function() { $('#filetmp').val($(this).val()); }); 
+settings = { success: function(data){ 
+								subject='Link to shared data in DKRZ-Cloud'
+								body = 'I want to share a file with you. Please use following URL, which is valid for 7 days:\n\n' + data
+								html='<div class="alert alert-success">\
+									<button type="button" class="close" data-dismiss="alert">&times;</button> \
+							    <p>{% trans "Use the following URL to share this object. The URL is valid for 7 days." %}</p> \
+							    <p><code>' + data +  '</code></p> \
+							    <p>{% trans "Please note that you cannot revoke this URL. It is valid until expiration!" %}</p> \
+							   <a href=mailto:?body='  + encodeURIComponent(body) + '&amp;subject=' + encodeURIComponent(subject) +'> \
+							  	Send Link via eMail</a> </div>'
+							  	$('#containerdiv').prepend(html);
+						},
+			  error: function(){ 
+			        html = '<div class="alert alert-error"> \
+		            		<button type="button" class="close" data-dismiss="alert">&times;</button> \
+		             <strong>{% trans "Warning!" %}</strong> {% trans "Cannot create temporary url. Access denied." %}</div>'
+		           $('#containerdiv').prepend(html);
+				 }
+			};
+
+$( "#tempurllink" ).click(function( event ) {
+	  event.preventDefault();
+	  $.ajax($("#tempurllink").attr('href'), settings);
+	});
+</script> 
+{% endblock %}
 

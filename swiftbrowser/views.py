@@ -370,24 +370,9 @@ def tempurl(request, container, objectname):
                        container, objectname, 7 * 24 * 3600)
 
     if not url:
-        messages.add_message(request, messages.ERROR, _("Access denied."))
-        return redirect(objectview, container=container)
+        return HttpResponseForbidden()
 
-    prefix = '/'.join(objectname.split('/')[:-1])
-    if prefix:
-        prefix += '/'
-    prefixes = prefix_list(prefix)
-
-    return render_to_response('tempurl.html',
-                              {'url': url,
-                               'account': storage_url.split('/')[-1],
-                               'container': container,
-                               'prefix': prefix,
-                               'prefixes': prefixes,
-                               'objectname': objectname,
-                               'session': request.session,
-                               },
-                              context_instance=RequestContext(request))
+    return HttpResponse(url, content_type="text/plain")
 
 
 def create_pseudofolder(request, container, prefix=None):
