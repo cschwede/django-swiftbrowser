@@ -217,8 +217,20 @@ def delete_object(request, container, objectname):
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
     try:
-        client.delete_object(storage_url, auth_token, container, objectname)
-        messages.add_message(request, messages.INFO, _("Object deleted."))
+        headers = client.head_object(storage_url, auth_token, container,
+                                      objectname)
+        if headers.get('content-type', '') == 'application/directory':
+            #retrieve list of all subdirs
+            x, objects = client.get_container(storage_url, auth_token,
+                                              container, prefix=objectname)
+            for o in objects:
+                name = o['name']
+                client.delete_object(storage_url, auth_token, container, name)
+            messages.add_message(request, messages.INFO, _("Folder deleted."))
+        else:
+            client.delete_object(storage_url, auth_token, container,
+                                 objectname)
+            messages.add_message(request, messages.INFO, _("Object deleted."))
     except client.ClientException:
         messages.add_message(request, messages.ERROR, _("Access denied."))
     if objectname[-1] == '/':  # deleting a pseudofolder, move one level up
