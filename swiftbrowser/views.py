@@ -6,9 +6,11 @@ import time
 import urlparse
 import hmac
 from hashlib import sha1
+import logging
 
 from swiftclient import client
 
+from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib import messages
@@ -20,9 +22,12 @@ from swiftbrowser.forms import CreateContainerForm, PseudoFolderForm, \
                                LoginForm, AddACLForm
 from swiftbrowser.utils import replace_hyphens, prefix_list, \
                                pseudofolder_object_list, get_temp_key,\
-                               get_base_url, get_temp_url
+                               get_base_url, get_temp_url, create_thumbnail,\
+                               get_original_account
 
 import swiftbrowser
+
+logger = logging.getLogger(__name__)
 
 
 def login(request):
@@ -489,3 +494,53 @@ def edit_acl(request, container):
         'public': public,
         'base_url': base_url,
     }, context_instance=RequestContext(request))
+
+
+def serve_thumbnail(request, container, objectname):
+    if request.session.get('username', '') == settings.THUMBNAIL_USER:
+        return HttpResponseForbidden()
+
+    storage_url = request.session.get('storage_url', '')
+    auth_token = request.session.get('auth_token', '')
+
+    try:
+        im_headers = client.head_object(storage_url, auth_token, container,
+                                    objectname)
+        im_ts = float(im_headers['x-timestamp'])
+    except client.ClientException as e:
+        logger.error("Cannot head object %s of container %s. Error: %s "
+                     % (objectname, container, str(e)))
+        return HttpResponseServerError()
+
+    #Is this an alias container? Then use the original account
+    #to prevent duplicating
+    (account, original_container_name) = get_original_account(
+                                        storage_url, auth_token, container)
+    if account is None:
+        return HttpResponseServerError()
+
+    (thumbnail_storage_url, thumbnail_auth_token) = client.get_auth(
+            settings.SWIFT_AUTH_URL, settings.THUMBNAIL_USER,
+            settings.THUMBNAIL_AUTH_KEY)
+    try:
+        th_headers = client.head_object(thumbnail_storage_url,
+                                        thumbnail_auth_token, account,
+                                        "%s_%s" % (original_container_name,
+                                        objectname))
+        th_ts = float(th_headers['x-timestamp'])
+        if th_ts < im_ts:
+            create_thumbnail(request, account, original_container_name,
+                             container, objectname)
+    except client.ClientException:
+        create_thumbnail(request, account, original_container_name,
+                         container, objectname)
+    th_name = "%s_%s" % (original_container_name, objectname)
+    try:
+        headers, image_data = client.get_object(thumbnail_storage_url,
+                        thumbnail_auth_token, account, th_name)
+    except client.ClientException as e:
+        logger.error("Cannot get object %s of container %s. Error: %s "
+                     % (th_name, account, str(e)))
+        return HttpResponseServerError()
+
+    return HttpResponse(image_data, mimetype=headers['content-type'])

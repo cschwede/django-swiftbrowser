@@ -5,6 +5,7 @@
 import mock
 import random
 
+from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
@@ -312,3 +313,180 @@ class MockTest(TestCase):
         swiftclient.client.post_container.assert_called_with('', '',
             'container', {'X-Container-Read': ',testuser',
                           'X-Container-Write': ',testuser'})
+
+    def test_serve_thumbnail(self):
+        container = 'container'
+        objectname = 'obj'
+        storage_url = '/account'
+        auth_token = 'auth'
+        orig_container = 'orig_container'
+        orig_account = 'orig_account'
+        th_storage_url = 'ts'
+        th_auth_token = 'ta'
+        th_name = "%s_%s" % (orig_container, objectname)
+
+        url = reverse('serve_thumbnail',
+                                       kwargs={'container': container,
+                                               'objectname': objectname})
+
+        swiftclient.client.get_auth = mock.Mock(return_value=(storage_url,
+                                                                  auth_token))
+        self.client.post(reverse('login'), {'username': 'test:tester',
+                                            'password': 'secret'})
+
+        with mock.patch('swiftbrowser.views.get_original_account',
+                        mock.Mock(return_value=(None, None))):
+            swiftclient.client.head_object = mock.Mock(
+                        side_effect=swiftclient.client.ClientException(''))
+            resp = self.client.get(url)
+            swiftclient.client.head_object.assert_called_with(storage_url,
+                                                              auth_token,
+                                                             container,
+                                                             objectname)
+            self.assertEqual(resp.status_code, 500)
+
+            swiftclient.client.head_object = mock.Mock()
+            self.assertEqual(resp.status_code, 500)
+
+        with mock.patch('swiftbrowser.views.get_original_account',
+                        mock.Mock(return_value=(orig_account,
+                                                orig_container))), mock.patch(
+                        'swiftbrowser.views.create_thumbnail',
+                        mock.Mock()) as ct_mock:
+            swiftclient.client.get_auth = mock.Mock(return_value=(
+                                                                th_storage_url,
+                                                                th_auth_token))
+
+            def effect(a, b, c, d):
+                if a == th_storage_url:
+                    raise swiftclient.client.ClientException('')
+                else:
+                    return {'x-timestamp': '0'}
+            m = mock.Mock()
+            m.side_effect = effect
+            swiftclient.client.head_object = m
+            headers = {'content-type': 'image'}
+            swiftclient.client.get_object = mock.Mock(
+                        side_effect=swiftclient.client.ClientException(''))
+            resp = self.client.get(url)
+            expected = [mock.call(storage_url, auth_token, container,
+                                  objectname),
+                        mock.call(th_storage_url, th_auth_token, orig_account,
+                                  th_name)]
+            self.assertEqual(swiftclient.client.head_object.call_args_list,
+                             expected)
+            self.assert_(ct_mock.called)
+            swiftclient.client.get_object.assert_called_with(th_storage_url,
+                                                             th_auth_token,
+                                                             orig_account,
+                                                             th_name)
+            self.assertEqual(resp.status_code, 500)
+
+            swiftclient.client.get_object = mock.Mock(return_value=(headers,
+                                                                    'x'))
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200)
+
+            ct_mock.reset_mock()
+
+            def effect_2(a, b, c, d):
+                if a == th_storage_url:
+                    return {'x-timestamp': '1'}
+                else:
+                    return {'x-timestamp': '0'}
+            m = mock.Mock()
+            m.side_effect = effect_2
+            swiftclient.client.head_object = m
+            resp = self.client.get(url)
+            self.assertFalse(ct_mock.called)
+            self.assertEqual(resp.status_code, 200)
+
+            def effect_3(a, b, c, d):
+                    return {'x-timestamp': '0'}
+            m = mock.Mock()
+            m.side_effect = effect_3
+            swiftclient.client.head_object = m
+            resp = self.client.get(url)
+            self.assertFalse(ct_mock.called)
+            self.assertEqual(resp.status_code, 200)
+
+            def effect_4(a, b, c, d):
+                if a == th_storage_url:
+                    return {'x-timestamp': '0'}
+                else:
+                    return {'x-timestamp': '1'}
+            m = mock.Mock()
+            m.side_effect = effect_4
+            swiftclient.client.head_object = m
+            resp = self.client.get(url)
+            self.assert_(ct_mock.called)
+            self.assertEqual(resp.status_code, 200)
+
+    @mock.patch('swiftbrowser.utils.Image', mock.Mock())
+    @mock.patch('swiftbrowser.views.get_original_account',
+                                        mock.Mock(return_value=('orig_account',
+                                                'orig_container')))
+    def test_create_thumbnail(self):
+        container = 'container'
+        objectname = 'obj'
+        storage_url = '/account'
+        auth_token = 'auth'
+        orig_container = 'orig_container'
+        orig_account = 'orig_account'
+        th_storage_url = 'ts'
+        th_auth_token = 'ta'
+        th_name = "%s_%s" % (orig_container, objectname)
+
+        url = reverse('serve_thumbnail',
+                                       kwargs={'container': container,
+                                               'objectname': objectname})
+
+        swiftclient.client.get_auth = mock.Mock(return_value=(storage_url,
+                                                                  auth_token))
+        self.client.post(reverse('login'), {'username': 'test:tester',
+                                            'password': 'secret'})
+
+        swiftclient.client.get_auth = mock.Mock(return_value=(th_storage_url,
+                                                                th_auth_token))
+
+        def effect(a, b, c, d):
+            if a == th_storage_url:
+                raise swiftclient.client.ClientException('')
+            else:
+                return {'x-timestamp': '0'}
+        m = mock.Mock()
+        m.side_effect = effect
+        swiftclient.client.head_object = m
+        headers = {'content-type': 'image'}
+        swiftclient.client.get_object = mock.Mock(return_value=(headers,
+                                                                'x'))
+
+        swiftclient.client.head_container = mock.Mock(
+                      side_effect=swiftclient.client.ClientException(''))
+        swiftclient.client.put_container = mock.Mock(
+                      side_effect=swiftclient.client.ClientException(''))
+        self.client.get(url)
+        swiftclient.client.head_container.assert_called_with(
+                            th_storage_url, th_auth_token, orig_account)
+        swiftclient.client.put_container.assert_called_with(
+                            th_storage_url, th_auth_token, orig_account)
+
+        swiftclient.client.put_container = mock.Mock()
+        swiftclient.client.get_object = mock.Mock(
+                      side_effect=swiftclient.client.ClientException(''))
+        self.client.get(url)
+        self.assertEqual(swiftclient.client.get_object.call_args_list[-2],
+                    mock.call(storage_url, auth_token, container,
+                                   objectname))
+
+        headers = {'content-type': 'image'}
+        swiftclient.client.get_object = mock.Mock(return_value=(headers,
+                                                                'x'))
+        swiftclient.client.put_object = mock.Mock(
+                      side_effect=swiftclient.client.ClientException(''))
+        self.client.get(url)
+        headers = {'X-Delete-After': settings.THUMBNAIL_DURABILITY}
+        swiftclient.client.put_object.assert_called_with(th_storage_url,
+                                                        th_auth_token,
+                                              orig_account, th_name, '',
+                                              headers=headers)

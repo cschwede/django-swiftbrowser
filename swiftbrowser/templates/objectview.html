@@ -35,7 +35,7 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th style="width: 0.5em;" class="hidden-phone"></th>
+            <th style="width: 32px;" class="hidden-phone"></th>
             <th>{% trans 'Name' %}</th>
             <th style="width: 12.5em;" class="hidden-phone">{% trans 'Created' %}</th>
             <th style="width: 6em;" class="hidden-phone">{% trans 'Size' %}</th>
@@ -86,9 +86,10 @@
             </tr>
         {% endfor %}
 
+        {% load mimetypes %}
         {% for key in objects %}
             <tr>
-                <td class="hidden-phone"><i class="icon-file"></i></td>
+                <td class="hidden-phone"><img src={% ifequal  key.content_type|slice:":6" "image/" %}"{% url "serve_thumbnail"  container=container objectname=key.name %}"{% else %}"{% icon key.content_type "32x32" %}"{% endifequal %} width="32" height="32"></td>
                 <td><a href="{% url "download" container=container objectname=key.name %}" class="block">{{key.name|lastpart}}</a></td>
                 <td class="hidden-phone">{{key.last_modified|dateconv|date:"SHORT_DATETIME_FORMAT"}}</td>
 	            <td class="hidden-phone">{{key.bytes|filesizeformat}}</td>
