@@ -224,6 +224,49 @@ def download(request, container, objectname):
     return redirect(url)
 
 
+def download_collection(request, container, prefix=None, non_recursive=False):
+    """ Download the content of an entire container/pseudofolder
+    as a Zip file. """
+
+    storage_url = request.session.get('storage_url', '')
+    auth_token = request.session.get('auth_token', '')
+
+    delimiter = '/' if non_recursive else None
+    try:
+        x, objects = client.get_container(storage_url, auth_token,
+                                         container, delimiter=delimiter,
+                                         prefix=prefix)
+    except client.ClientException:
+        return HttpResponseForbidden()
+
+    x, objs = pseudofolder_object_list(objects, prefix)
+
+    output = StringIO()
+    zipf = zipfile.ZipFile(output, 'w')
+    for o in objs:
+        name = o['name']
+        try:
+            x, content = client.get_object(storage_url, auth_token, container,
+                                           name)
+        except client.ClientException:
+            return HttpResponseForbidden()
+
+        if prefix:
+            name = name[len(prefix):]
+        zipf.writestr(name, content)
+    zipf.close()
+
+    if prefix:
+        filename = prefix.split('/')[-2]
+    else:
+        filename = container
+    response = HttpResponse(output.getvalue(), 'application/zip')
+    response['Content-Disposition'] = 'attachment; filename="%s.zip"'\
+    % (filename)
+    output.close()
+    return response
+    
+    
 def delete_object(request, container, objectname):
     """ Deletes an object """
 

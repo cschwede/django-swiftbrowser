@@ -84,6 +84,9 @@
                     <div class="dropdown pull-right">
                         <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
                         <ul class="dropdown-menu">
+                            <li><a href="{% url "download_collection" container=container prefix=folder.0 %}"><i class="icon-download"></i> {% trans 'Download' %}</a></li>
+                            <li><a href="{% url "download_collection_nonrec" container=container prefix=folder.0  %}"><i class="icon-download"></i> {% trans 'Download nonrecursive' %}</a></li>
+                            <li class="divider" />
                             <li><a href="{% url "delete_object" container=container objectname=folder.1  %}" onclick="return confirm('{% trans 'Delete folder' %} {{folder.1}}?');" ><i class="icon-fire"></i> {% trans 'Delete folder' %}</a></li>
                             <li><a href="{% url "move_collection_to_trash" container=container prefix=folder.1  %}"  ><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
                         </ul>

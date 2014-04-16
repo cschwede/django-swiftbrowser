@@ -3,7 +3,8 @@ from swiftbrowser.views import containerview, objectview, download,\
     delete_object, login, tempurl, upload, create_pseudofolder,\
     create_container, delete_container, public_objectview, toggle_public,\
     edit_acl, serve_thumbnail, move_to_trash, trashview, delete_trash,\
-    restore_trash, move_collection_to_trash, restore_trash_collection
+    restore_trash, move_collection_to_trash, restore_trash_collection,\
+    download_collection
 
 urlpatterns = patterns('swiftbrowser.views',
     url(r'^login/$', login, name="login"),
@@ -42,4 +43,9 @@ urlpatterns = patterns('swiftbrowser.views',
     url(r'^move_collection_to_trash/(?P<container>.+?)/(?P<prefix>.+?)?$',
         move_collection_to_trash,
         name="move_collection_to_trash"),
+    url(r'^download_collection/(?P<container>.+?)/(?P<prefix>.+)?$',
+       download_collection, name="download_collection"),
+    url(r'^download_collection_nonrec/(?P<container>.+?)/(?P<prefix>.+)?$',
+        download_collection,
+        {'non_recursive': True}, name="download_collection_nonrec"),
     )

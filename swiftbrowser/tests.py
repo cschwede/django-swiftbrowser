@@ -964,3 +964,90 @@ class MockTest(TestCase):
                                                         th_auth_token,
                                               orig_account, th_name, '',
                                               headers=headers)
+
+    @mock.patch('zipfile.ZipFile', mock.Mock())
+    def test_download_collection(self):
+        container = 'container'
+        storage_url = '/account'
+        auth_token = 'auth'
+        prefix = 'prefix/'
+
+        def url(prefix=None, non_rec=False):
+            kwargs = {'container': container}
+            if prefix:
+                kwargs['prefix'] = prefix
+            if non_rec:
+                return reverse('download_collection_nonrec', kwargs=kwargs)
+            else:
+                return reverse('download_collection', kwargs=kwargs)
+
+        swiftclient.client.get_auth = mock.Mock(return_value=(storage_url,
+                                                                  auth_token))
+        self.client.post(reverse('login'), {'username': 'test:tester',
+                                            'password': 'secret'})
+
+        swiftclient.client.get_container = mock.Mock(
+                      side_effect=swiftclient.client.ClientException(''))
+        resp = self.client.get(url())
+        self.assertEqual(resp.status_code, 403)
+        swiftclient.client.get_container.assert_called_with(storage_url,
+                                                            auth_token,
+                                                            container,
+                                                            prefix=None,
+                                                            delimiter=None
+                                                            )
+
+        resp = self.client.get(url(prefix))
+        self.assertEqual(resp.status_code, 403)
+        swiftclient.client.get_container.assert_called_with(storage_url,
+                                                            auth_token,
+                                                            container,
+                                                            prefix=prefix,
+                                                            delimiter=None
+                                                            )
+
+        resp = self.client.get(url(prefix, True))
+        self.assertEqual(resp.status_code, 403)
+        swiftclient.client.get_container.assert_called_with(storage_url,
+                                                            auth_token,
+                                                            container,
+                                                            prefix=prefix,
+                                                            delimiter='/'
+                                                            )
+
+        resp = self.client.get(url(non_rec=True))
+        self.assertEqual(resp.status_code, 403)
+        swiftclient.client.get_container.assert_called_with(storage_url,
+                                                            auth_token,
+                                                            container,
+                                                            prefix=None,
+                                                            delimiter='/'
+                                                            )
+
+        objs = [{'name': 'obj1'}, {'name': 'obj2'}, {'name': 'obj3'}]
+        swiftclient.client.get_container = mock.Mock(return_value=(None, objs))
+        m = mock.Mock(side_effect=(lambda o, p: (None, o)))
+        with mock.patch('swiftbrowser.views.pseudofolder_object_list', m):
+            swiftclient.client.get_object = mock.Mock(
+                      side_effect=swiftclient.client.ClientException(''))
+            resp = self.client.get(url())
+            self.assertEqual(resp.status_code, 403)
+
+            swiftclient.client.get_object = mock.Mock(return_value=(None, ''))
+            resp = self.client.get(url())
+            expected = [mock.call(storage_url, auth_token, container,
+                                           objs[0]['name']),
+                        mock.call(storage_url, auth_token, container,
+                                           objs[1]['name']),
+                        mock.call(storage_url, auth_token, container,
+                                           objs[2]['name'])]
+            self.assertEqual(swiftclient.client.get_object.call_args_list,
+                             expected)
+            self.assertEqual(resp['Content-Disposition'], 'attachment; '
+                             'filename="%s.zip"' % container)
+            self.assertEqual(resp.status_code, 200)
+
+            resp = self.client.get(url(prefix))
+            self.assertEqual(resp['Content-Disposition'], 'attachment; '
+                             'filename="%s.zip"' % prefix[:-1])
+            self.assertEqual(resp.status_code, 200)

@@ -43,7 +43,17 @@
                             <li><a href="{{ edit_acl_url }}"><i class="icon-user"></i> {% trans 'Sharing' %}</a></li>
                             <li class="divider" />
                         {% endif %}
- 
+                        <li>
+                            <a href="{% url "download_collection" container=container.name %}">
+                                <i class="icon-download"></i> {% trans 'Download' %}
+                            </a>
+                        </li>
+                         <li>
+                            <a href="{% url "download_collection_nonrec" container=container.name %}">
+                                <i class="icon-download"></i> {% trans 'Download nonrecursive' %}
+                            </a>
+                        </li>
+                        <li class="divider" />
                         <li>
                             <a href="{% url "delete_container" container=container.name %}" onclick="return confirm('{% trans 'Delete container' %} {{container.name}}?');">
                                 <i class="icon-fire"></i> {% trans 'Delete container' %}
