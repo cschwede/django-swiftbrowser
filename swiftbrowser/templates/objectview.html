@@ -106,7 +106,7 @@
                     <div class="dropdown pull-right">
                         <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{% url "tempurl" container=container objectname=key.name %}" id="tempurllink"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
+                            <li><a href="{% url "tempurl" container=container objectname=key.name %}" id="tempurl_link"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
                             <li class="divider" />
                             <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-fire"></i> {% trans 'Delete Object' %}</a></li>
                             <li><a href="{% url "move_to_trash" container=container objectname=key.name  %}"><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
@@ -153,9 +153,9 @@ settings = { success: function(data){
 				 }
 			};
 
-$( "#tempurllink" ).click(function( event ) {
+$( ".tempurl_link" ).click(function( event ) {
 	  event.preventDefault();
-	  $.ajax($("#tempurllink").attr('href'), settings);
+	  $.ajax($(this).attr('href'), settings);
 	});
 </script> 
 {% endblock %}
