@@ -385,11 +385,8 @@ def edit_acl(request, container):
         if form.is_valid():
             username = form.cleaned_data['username']
 
-            try:
-                (readers, writers) = get_acls(storage_url,
-                    auth_token, container)
-            except KeyError:
-                return redirect(logout)
+            (readers, writers) = get_acls(
+                storage_url, auth_token, container)
 
             readers = remove_duplicates_from_acl(readers)
             writers = remove_duplicates_from_acl(writers)
