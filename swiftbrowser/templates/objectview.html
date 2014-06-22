@@ -5,7 +5,7 @@
 {% load lastpart %}
 {% block content %}
 
-<div class="container">
+<div id='containerdiv' class="container">
 {% include "messages.html" %}
 
         <ul class="breadcrumb">
@@ -35,7 +35,7 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th style="width: 0.5em;" class="hidden-phone"></th>
+            <th style="width: 32px;" class="hidden-phone"></th>
             <th>{% trans 'Name' %}</th>
             <th style="width: 12.5em;" class="hidden-phone">{% trans 'Created' %}</th>
             <th style="width: 6em;" class="hidden-phone">{% trans 'Size' %}</th>
@@ -80,15 +80,25 @@
                 <td class="hidden-phone"></td>
                 <td class="hidden-phone"></td>
 
-                    <td>
-                    <a href="{% url "delete_object" container=container objectname=folder.1 %}" class="btn btn-mini btn-danger" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-trash icon-white"></i></a>
-                    </td>
+                <td>
+                    <div class="dropdown pull-right">
+                        <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
+                        <ul class="dropdown-menu">
+                                <li><a href="{% url "download_collection" container=container prefix=folder.0 %}"><i class="icon-download"></i> {% trans 'Download' %}</a></li>
+                            <li><a href="{% url "download_collection_nonrec" container=container prefix=folder.0  %}"><i class="icon-download"></i> {% trans 'Download nonrecursive' %}</a></li>
+                            <li class="divider" />
+                            <li><a href="{% url "delete_object" container=container objectname=folder.1  %}" onclick="return confirm('{% trans 'Delete folder' %} {{folder.1}}?');" ><i class="icon-fire"></i> {% trans 'Delete folder' %}</a></li>
+                            <li><a href="{% url "move_collection_to_trash" container=container prefix=folder.1  %}"  ><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
+                        </ul>
+                    </div>
+                </td>
             </tr>
         {% endfor %}
 
+        {% load mimetypes %}
         {% for key in objects %}
             <tr>
-                <td class="hidden-phone"><i class="icon-file"></i></td>
+                <td class="hidden-phone"><img src={% ifequal  key.content_type|slice:":6" "image/" %}"{% url "serve_thumbnail"  container=container objectname=key.name %}"{% else %}"{% icon key.content_type "32x32" %}"{% endifequal %} width="32" height="32"></td>
                 <td><a href="{% url "download" container=container objectname=key.name %}" class="block">{{key.name|lastpart}}</a></td>
                 <td class="hidden-phone">{{key.last_modified|dateconv|date:"SHORT_DATETIME_FORMAT"}}</td>
 	            <td class="hidden-phone">{{key.bytes|filesizeformat}}</td>
@@ -96,9 +106,10 @@
                     <div class="dropdown pull-right">
                         <a class="dropdown-toggle btn btn-mini btn-danger" data-toggle="dropdown"><i class="icon-chevron-down icon-white"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{% url "tempurl" container=container objectname=key.name %}"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
+                            <li><a href="{% url "tempurl" container=container objectname=key.name %}" id="tempurl_link"><i class="icon-time"></i> {% trans 'Temporary URL' %}</a></li>
                             <li class="divider" />
-                            <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-trash"></i> Delete object</a></li>
+                            <li><a href="{% url "delete_object" container=container objectname=key.name  %}" onclick="return confirm('{% trans 'Delete object' %} {{key.name}}?');" ><i class="icon-fire"></i> {% trans 'Delete Object' %}</a></li>
+                            <li><a href="{% url "move_to_trash" container=container objectname=key.name  %}"><i class="icon-trash"></i> {% trans 'Move to trash' %}</a></li>
                         </ul>
                     </div>
                 </td>
@@ -115,9 +126,37 @@
             </tr>
         </tbody>
         {% endif %}
-        <tfoot><tr><td colspan="5"></td></tr></tfoot>
+        <tfoot><tr><td><a href="{% url "trashview" account=account %}" role="button" class="btn btn-mini"><i class="icon-trash"></i></a></td>
+        <td colspan="5"></td></tr></tfoot>
     </table>
 </div>
 {% endblock %}
-    {% block jsadd %} <script type="text/javascript"> $('input[id=file]').change(function() { $('#filetmp').val($(this).val()); }); </script> {% endblock %}
+{% block jsadd %} 
+<script type="text/javascript"> $('input[id=file]').change(function() { $('#filetmp').val($(this).val()); }); 
+settings = { success: function(data){ 
+								subject='Link to shared data in DKRZ-Cloud'
+								body = 'I want to share a file with you. Please use following URL, which is valid for 7 days:\n\n' + data
+								html='<div class="alert alert-success">\
+									<button type="button" class="close" data-dismiss="alert">&times;</button> \
+							    <p>{% trans "Use the following URL to share this object. The URL is valid for 7 days." %}</p> \
+							    <p><code>' + data +  '</code></p> \
+							    <p>{% trans "Please note that you cannot revoke this URL. It is valid until expiration!" %}</p> \
+							   <a href=mailto:?body='  + encodeURIComponent(body) + '&amp;subject=' + encodeURIComponent(subject) +'> \
+							  	Send Link via eMail</a> </div>'
+							  	$('#containerdiv').prepend(html);
+						},
+			  error: function(){ 
+			        html = '<div class="alert alert-error"> \
+		            		<button type="button" class="close" data-dismiss="alert">&times;</button> \
+		             <strong>{% trans "Warning!" %}</strong> {% trans "Cannot create temporary url. Access denied." %}</div>'
+		           $('#containerdiv').prepend(html);
+				 }
+			};
+
+$( ".tempurl_link" ).click(function( event ) {
+	  event.preventDefault();
+	  $.ajax($(this).attr('href'), settings);
+	});
+</script> 
+{% endblock %}
 

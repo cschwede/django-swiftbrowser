@@ -17,7 +17,7 @@ setup(
     url='http://www.cschwede.com/',
     author='Christian Schwede',
     author_email='info@cschwede.de',
-    install_requires=['django>=1.5', 'python-swiftclient'],
+    install_requires=['django>=1.5', 'python-swiftclient', 'django-icons-mimetypes>=1.0', 'PIL'],
     zip_safe=False,
     classifiers=[
         'Environment :: Web Environment',
