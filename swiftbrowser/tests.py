@@ -273,8 +273,8 @@ class MockTest(TestCase):
 
         response = self.client.get(reverse('tempurl', args=['ü', 'ö']))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['container'], 'ü')
-        self.assertEqual(response.context['objectname'], 'ö')
+        self.assertEqual(response.context['container'], u'ü')
+        self.assertEqual(response.context['objectname'], u'ö')
 
     def test_create_pseudofolder(self):
         swiftclient.client.put_object = mock.Mock(

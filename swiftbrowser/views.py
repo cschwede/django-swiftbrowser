@@ -292,9 +292,6 @@ def public_objectview(request, account, container, prefix=None):
 def tempurl(request, container, objectname):
     """ Displays a temporary URL for a given container object """
 
-    container = unicode(container).encode('utf-8')
-    objectname = unicode(objectname).encode('utf-8')
-
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
 
