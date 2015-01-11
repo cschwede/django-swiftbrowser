@@ -1,5 +1,4 @@
 include LICENSE
 include README.md
-recursive-include swiftbrowser/static *
 recursive-include swiftbrowser/templates *
 recursive-include swiftbrowser/templatetags *

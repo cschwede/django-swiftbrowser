@@ -16,7 +16,7 @@ Quick Install
 
 1) Install swiftbrowser:
 
-    pip install https://github.com/cschwede/django-swiftbrowser/zipball/master
+    pip install django-swiftbrowser
 
 2) Please make sure that "tempurl" and "formpost" middlewares are activated in your proxy server. Extract from /etc/swift/proxy-server.conf:
 
