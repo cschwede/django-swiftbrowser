@@ -32,6 +32,7 @@ Quick Install
 
 
 3) Adopt myproj/settings.py to your needs, especially settings for Swift and static file directories.
+   Please note: you need to change BASE_URL if you're using the built-in development server with non-default settings.
 
 4) Update myproj/urls.py and include swiftbrowser.urls:
 
