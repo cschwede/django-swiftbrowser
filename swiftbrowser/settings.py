@@ -1,14 +1,6 @@
 """ Settings for Django project """
 import os
 
-# The database isn't used, but Django might complain if setting missing
-DATABASES = { 
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'swiftbrowser.db'
-    }   
-}
-
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 USE_L10N = True
@@ -30,12 +22,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 )
 
-ROOT_URLCONF = 'myproj.urls'
+ROOT_URLCONF = 'swiftbrowser.urls'
 
 INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
-    'swiftbrowser', 
+    'swiftbrowser',
 )
 
 SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'

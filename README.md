@@ -16,43 +16,9 @@ Quick Install
 
 1) Install swiftbrowser:
 
-    git clone git://github.com/cschwede/django-swiftbrowser.git
-    cd django-swiftbrowser
-    sudo python setup.py install
+    pip install https://github.com/cschwede/django-swiftbrowser/zipball/master
 
-   Optional: run tests
-
-    python runtests.py
-
-2) Create a new Django project:
-
-    django-admin.py startproject myproj
-    cd myproj
-    cp ~/django-swiftbrowser/example/settings.py myproj/settings.py
-
-3) Adopt myproj/settings.py to your needs, especially Swift settings.
-   Please note: you need to change BASE_URL if you're using the built-in development server with non-default settings.
-
-4) Update myproj/urls.py and include swiftbrowser.urls:
-
-    import swiftbrowser.urls
-
-    urlpatterns = patterns('',
-        url(r'^', include(swiftbrowser.urls)),
-    )
-
-5) Run development server:
-    
-    python manage.py runserver
-
-   *Important*: Either use 'python manage.py runserver --insecure' or set DEBUG = True in myproj/settings.py if you want to use the
-   local development server. Don't use these settings in production!
-
-6) Use 'account:username' to login (or tenant/project:username if using Keystone).
-
-7) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
-
-8) Please make sure that "tempurl" and "formpost" middlewares are activated in your proxy server. Extract from /etc/swift/proxy-server.conf:
+2) Please make sure that "tempurl" and "formpost" middlewares are activated in your proxy server. Extract from /etc/swift/proxy-server.conf:
 
     [pipeline:main]
     pipeline = catch_errors gatekeeper healthcheck proxy-logging cache tempurl formpost tempauth proxy-logging proxy-server
@@ -62,6 +28,12 @@ Quick Install
 
     [filter:formpost]
     use = egg:swift#formpost
+
+3) Run development server:
+
+    django-admin runserver --settings=swiftbrowser.settings
+
+4) Open "http://127.0.0.1:8000/" in your browser and use 'account:username' to login (or tenant/project:username if using Keystone).
 
 
 Screenshots
