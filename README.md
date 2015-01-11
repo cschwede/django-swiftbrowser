@@ -30,8 +30,7 @@ Quick Install
     cd myproj
     cp ~/django-swiftbrowser/example/settings.py myproj/settings.py
 
-
-3) Adopt myproj/settings.py to your needs, especially settings for Swift and static file directories.
+3) Adopt myproj/settings.py to your needs, especially Swift settings.
    Please note: you need to change BASE_URL if you're using the built-in development server with non-default settings.
 
 4) Update myproj/urls.py and include swiftbrowser.urls:
@@ -42,22 +41,18 @@ Quick Install
         url(r'^', include(swiftbrowser.urls)),
     )
 
-5) Collect static files:
-
-    python manage.py collectstatic
-
-6) Run development server:
+5) Run development server:
     
     python manage.py runserver
 
    *Important*: Either use 'python manage.py runserver --insecure' or set DEBUG = True in myproj/settings.py if you want to use the
    local development server. Don't use these settings in production!
 
-7) Use 'account:username' to login (or tenant/project:username if using Keystone).
+6) Use 'account:username' to login (or tenant/project:username if using Keystone).
 
-8) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
+7) Deploying to production? Have a look at Djangos docs: https://docs.djangoproject.com/en/1.5/howto/deployment/wsgi/
 
-9) Please make sure that "tempurl" and "formpost" middlewares are activated in your proxy server. Extract from /etc/swift/proxy-server.conf:
+8) Please make sure that "tempurl" and "formpost" middlewares are activated in your proxy server. Extract from /etc/swift/proxy-server.conf:
 
     [pipeline:main]
     pipeline = catch_errors gatekeeper healthcheck proxy-logging cache tempurl formpost tempauth proxy-logging proxy-server

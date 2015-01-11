@@ -43,12 +43,10 @@ SWIFT_AUTH_VERSION = 1 # 2 for keystone
 STORAGE_URL = 'http://127.0.0.1:8080/v1/'
 BASE_URL = 'http://127.0.0.1:8000'  # default if using built-in runserver
 SWAUTH_URL = 'http://127.0.0.1:8080/auth/v2'
-STATIC_DIR = '/var/www/myproj/static'
 
 TIME_ZONE = 'Europe/Berlin'
 LANGUAGE_CODE = 'de-de'
 SECRET_KEY = 'DONT_USE_THIS_IN_PRODUCTION'
-STATIC_URL = "/static/"
-STATIC_ROOT = "/var/www/myproj/static/"
+STATIC_URL = "http://cdnjs.cloudflare.com/ajax/libs/"
 
 ALLOWED_HOSTS = ['127.0.0.1', 'insert_your_hostname_here']
