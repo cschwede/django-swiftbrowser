@@ -14,7 +14,7 @@ setup(
     license='Apache License (2.0)',
     description='A simple Django app to access Openstack Swift',
     long_description=README,
-    url='http://www.cschwede.de/',
+    url='https://github.com/cschwede/django-swiftbrowser',
     author='Christian Schwede',
     author_email='info@cschwede.de',
     install_requires=['django>=1.5', 'python-swiftclient'],
