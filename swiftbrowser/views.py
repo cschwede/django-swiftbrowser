@@ -1,6 +1,5 @@
 """ Standalone webinterface for Openstack Swift. """
 # -*- coding: utf-8 -*-
-#pylint:disable=E1101
 import os
 import time
 import urlparse
@@ -17,10 +16,9 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from swiftbrowser.forms import CreateContainerForm, PseudoFolderForm, \
-                               LoginForm, AddACLForm
+    LoginForm, AddACLForm
 from swiftbrowser.utils import replace_hyphens, prefix_list, \
-                               pseudofolder_object_list, get_temp_key,\
-                               get_base_url, get_temp_url
+    pseudofolder_object_list, get_temp_key, get_base_url, get_temp_url
 
 import swiftbrowser
 
@@ -87,8 +85,8 @@ def create_container(request):
 
         return redirect(containerview)
 
-    return render_to_response('create_container.html', {
-                              }, context_instance=RequestContext(request))
+    return render_to_response(
+        'create_container.html', {}, context_instance=RequestContext(request))
 
 
 def delete_container(request, container):
@@ -145,8 +143,7 @@ def objectview(request, container, prefix=None):
         'prefixes': prefixes,
         'base_url': base_url,
         'account': account,
-        'public': public,
-        },
+        'public': public},
         context_instance=RequestContext(request))
 
 
@@ -178,8 +175,8 @@ def upload(request, container, prefix=None):
         else:
             return redirect(objectview, container=container)
 
-    hmac_body = '%s\n%s\n%s\n%s\n%s' % (path, redirect_url,
-        max_file_size, max_file_count, expires)
+    hmac_body = '%s\n%s\n%s\n%s\n%s' % (
+        path, redirect_url, max_file_size, max_file_count, expires)
     signature = hmac.new(key, hmac_body, sha1).hexdigest()
 
     prefixes = prefix_list(prefix)
@@ -263,9 +260,8 @@ def public_objectview(request, account, container, prefix=None):
     storage_url = settings.STORAGE_URL + account
     auth_token = ' '
     try:
-        _meta, objects = client.get_container(storage_url, auth_token,
-                                             container, delimiter='/',
-                                             prefix=prefix)
+        _meta, objects = client.get_container(
+            storage_url, auth_token, container, delimiter='/', prefix=prefix)
 
     except client.ClientException:
         messages.add_message(request, messages.ERROR, _("Access denied."))
@@ -284,8 +280,7 @@ def public_objectview(request, account, container, prefix=None):
         'prefixes': prefixes,
         'base_url': base_url,
         'storage_url': storage_url,
-        'account': account,
-        },
+        'account': account},
         context_instance=RequestContext(request))
 
 
@@ -397,8 +392,8 @@ def edit_acl(request, container):
             headers = {'X-Container-Read': readers,
                        'X-Container-Write': writers}
             try:
-                client.post_container(storage_url,
-                    auth_token, container, headers)
+                client.post_container(
+                    storage_url, auth_token, container, headers)
                 message = "ACLs updated."
                 messages.add_message(request, messages.INFO, message)
             except client.ClientException:

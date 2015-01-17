@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
-#pylint:disable=E1103
 
 import mock
 import random
@@ -18,7 +17,8 @@ class MockTest(TestCase):
     All calls using python-swiftclient.clients are replaced using mock """
 
     def test_container_view(self):
-        swiftclient.client.get_account = mock.Mock(return_value=[{}, []],
+        swiftclient.client.get_account = mock.Mock(
+            return_value=[{}, []],
             side_effect=swiftclient.client.ClientException(''))
 
         resp = self.client.get(reverse('containerview'))
@@ -73,7 +73,8 @@ class MockTest(TestCase):
         self.assertEqual(resp['Location'], 'http://testserver/')
 
     def test_objectview(self):
-        swiftclient.client.get_container = mock.Mock(return_value=[{}, []],
+        swiftclient.client.get_container = mock.Mock(
+            return_value=[{}, []],
             side_effect=swiftclient.client.ClientException(''))
 
         resp = self.client.get(reverse('objectview',
@@ -124,14 +125,14 @@ class MockTest(TestCase):
         swiftbrowser.utils.get_temp_url = mock.Mock(return_value="http://url")
 
         resp = self.client.get(reverse('download', kwargs={
-                                        'container': 'container',
-                                        'objectname': 'testfile'}))
+                                       'container': 'container',
+                                       'objectname': 'testfile'}))
         self.assertEqual(resp['Location'], "http://url")
 
         swiftbrowser.utils.get_temp_url = mock.Mock(return_value=None)
         resp = self.client.get(reverse('download', kwargs={
-                                        'container': 'container',
-                                        'objectname': 'testfile'}))
+                                       'container': 'container',
+                                       'objectname': 'testfile'}))
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp['Location'],
                          'http://testserver/objects/container/')
@@ -164,8 +165,8 @@ class MockTest(TestCase):
         swiftclient.client.delete_object = mock.Mock(
             side_effect=swiftclient.client.ClientException(''))
         resp = self.client.get(reverse('delete_object', kwargs={
-                                        'container': 'container',
-                                        'objectname': 'testfile'}))
+                                       'container': 'container',
+                                       'objectname': 'testfile'}))
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp['Location'],
                          'http://testserver/objects/container/')
@@ -191,8 +192,8 @@ class MockTest(TestCase):
                                            kwargs={'container': 'container'}))
         self.assertEqual(response.status_code, 302)
 
-        swiftclient.client.post_container.assert_called_with('', '',
-            'container', {'X-Container-Read': '.r:*,.rlistings'})
+        swiftclient.client.post_container.assert_called_with(
+            '', '', 'container', {'X-Container-Read': '.r:*,.rlistings'})
 
         swiftclient.client.head_container = mock.Mock(return_value={
             'x-container-read': 'x,.r:*,.rlistings'})
@@ -200,8 +201,8 @@ class MockTest(TestCase):
                                            kwargs={'container': 'container'}))
         self.assertEqual(response.status_code, 302)
 
-        swiftclient.client.post_container.assert_called_with('', '',
-            'container', {'X-Container-Read': 'x,'})
+        swiftclient.client.post_container.assert_called_with(
+            '', '', 'container', {'X-Container-Read': 'x,'})
 
     def test_public_objectview(self):
         swiftclient.client.get_container = mock.Mock(
@@ -251,8 +252,8 @@ class MockTest(TestCase):
         random.choice = mock.Mock(return_value="a")
 
         self.assertIsNotNone(swiftbrowser.utils.get_temp_key("dummy", "dummy"))
-        swiftclient.client.post_account.assert_called_with('dummy', 'dummy',
-            {'x-account-meta-temp-url-key': 'a' * 32})
+        swiftclient.client.post_account.assert_called_with(
+            'dummy', 'dummy', {'x-account-meta-temp-url-key': 'a' * 32})
 
         # Authorized, temp url key already set
         account = [{'x-account-meta-temp-url-key': 'dummy'}, ]
@@ -284,18 +285,20 @@ class MockTest(TestCase):
                                          'auth_token',
                                          'container')
 
-        resp = self.client.post(reverse('create_pseudofolder',
-                                        kwargs={'container': 'container'}),
-                                        {'foldername': 'test'})
+        resp = self.client.post(reverse(
+            'create_pseudofolder',
+            kwargs={'container': 'container'}),
+            {'foldername': 'test'})
         self.assertEqual(resp.status_code, 302)
 
-        swiftclient.client.put_object.assert_called_with('', '', u'container',
-            u'test/', None, content_type='application/directory')
+        swiftclient.client.put_object.assert_called_with(
+            '', '', u'container', u'test/',
+            None, content_type='application/directory')
 
-        resp = self.client.post(reverse('create_pseudofolder',
-                                        kwargs={'container': 'container',
-                                                'prefix': 'prefix'}),
-                                        {'foldername': 'test2'})
+        resp = self.client.post(reverse(
+            'create_pseudofolder',
+            kwargs={'container': 'container', 'prefix': 'prefix'}),
+            {'foldername': 'test2'})
         self.assertEqual(resp.status_code, 302)
 
     def test_edit_acl(self):
@@ -309,6 +312,7 @@ class MockTest(TestCase):
                                  'read': 'On',
                                  'write': 'On'})
         self.assertEqual(resp.status_code, 200)
-        swiftclient.client.post_container.assert_called_with('', '',
-            'container', {'X-Container-Read': ',testuser',
-                          'X-Container-Write': ',testuser'})
+        swiftclient.client.post_container.assert_called_with(
+            '', '', 'container',
+            {'X-Container-Read': ',testuser',
+             'X-Container-Write': ',testuser'})

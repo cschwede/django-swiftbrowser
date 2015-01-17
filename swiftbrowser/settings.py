@@ -12,7 +12,7 @@ TEMPLATE_LOADERS = (
 )
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-TEMPLATE_DIRS = ( os.path.join(PROJECT_PATH, 'templates'),)
+TEMPLATE_DIRS = (os.path.join(PROJECT_PATH, 'templates'),)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -31,7 +31,7 @@ INSTALLED_APPS = (
 )
 
 SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'
-SWIFT_AUTH_VERSION = 1 # 2 for keystone
+SWIFT_AUTH_VERSION = 1  # 2 for keystone
 STORAGE_URL = 'http://127.0.0.1:8080/v1/'
 BASE_URL = 'http://127.0.0.1:8000'  # default if using built-in runserver
 SWAUTH_URL = 'http://127.0.0.1:8080/auth/v2'

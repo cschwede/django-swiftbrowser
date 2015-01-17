@@ -1,6 +1,5 @@
 """ Forms for swiftbrowser.browser """
 # -*- coding: utf-8 -*-
-#pylint:disable=R0924
 from django import forms
 
 

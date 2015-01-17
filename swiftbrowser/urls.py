@@ -4,7 +4,8 @@ from swiftbrowser.views import containerview, objectview, download,\
     create_container, delete_container, public_objectview, toggle_public,\
     edit_acl
 
-urlpatterns = patterns('swiftbrowser.views',
+urlpatterns = patterns(
+    'swiftbrowser.views',
     url(r'^login/$', login, name="login"),
     url(r'^$', containerview, name="containerview"),
     url(r'^public/(?P<account>.+?)/(?P<container>.+?)/(?P<prefix>(.+)+)?$',
@@ -26,4 +27,4 @@ urlpatterns = patterns('swiftbrowser.views',
     url(r'^objects/(?P<container>.+?)/(?P<prefix>(.+)+)?$', objectview,
         name="objectview"),
     url(r'^acls/(?P<container>.+?)/$', edit_acl, name="edit_acl"),
-    )
+)

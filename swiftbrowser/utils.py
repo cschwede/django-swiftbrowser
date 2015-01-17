@@ -1,7 +1,5 @@
 """ Standalone webinterface for Openstack Swift. """
 # -*- coding: utf-8 -*-
-#pylint:disable=E0611, E1101
-import os
 import time
 import urlparse
 import hmac
@@ -11,10 +9,6 @@ from hashlib import sha1
 
 from swiftclient import client
 
-from django.http import HttpResponse
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
-from django.contrib import messages
 from django.conf import settings
 
 
