@@ -42,3 +42,7 @@ SECRET_KEY = 'DONT_USE_THIS_IN_PRODUCTION'
 STATIC_URL = "http://cdnjs.cloudflare.com/ajax/libs/"
 
 ALLOWED_HOSTS = ['127.0.0.1', 'insert_your_hostname_here']
+
+SWIFT_BROWSER_SETTINGS = {
+    "containers_per_page" : 5
+}

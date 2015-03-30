@@ -7,10 +7,10 @@
     {% include "messages.html" %}
         <ul class="breadcrumb">
             <li><a href="{% url "containerview" %}">Containers</a></li>
-       </ul> 
-    
+       </ul>
+
         <table class="table table-striped">
-        
+
         <thead>
             <tr>
                 <th style="width: 1em;" class="hidden-phone"></th>
@@ -20,7 +20,7 @@
                 <th style="width: 1em;">
 
                 <a href="{% url "create_container" %}" class="btn btn-mini btn-danger">
-                    <i class="icon-plus icon-white"></i> 
+                    <i class="icon-plus icon-white"></i>
                 </a>
 
                 </th>
@@ -43,7 +43,7 @@
                             <li><a href="{{ edit_acl_url }}"><i class="icon-user"></i> {% trans 'Sharing' %}</a></li>
                             <li class="divider" />
                         {% endif %}
- 
+
                         <li>
                             <a href="{% url "delete_container" container=container.name %}" onclick="return confirm('{% trans 'Delete container' %} {{container.name}}?');">
                                 <i class="icon-trash"></i> {% trans 'Delete container' %}
@@ -53,31 +53,50 @@
                 </div>
             </td>
 
-            </tr> 
+            </tr>
 
         {% empty %}
         <tr>
             <td colspan="5">
             <strong><center>{% trans 'There are no containers in this account yet. Create a new container by clicking the red button.' %}<center></strong>
             </td>
-        </tr> 
- 
+        </tr>
+
         {% endfor %}
-        </tbody> 
-       
+        </tbody>
+
         <tfoot>
             <tr>
                 <th colspan="5" class="center">
-                    {{account_stat.x_account_bytes_used|filesizeformat}} 
+                    {{account_stat.x_account_bytes_used|filesizeformat}}
                     {% if account_stat.x_account_meta_quota_bytes %}
                         {% trans 'of' %}
-                        {{account_stat.x_account_meta_quota_bytes|filesizeformat}} 
+                        {{account_stat.x_account_meta_quota_bytes|filesizeformat}}
                     {% endif %}
                     {% trans 'used' %}
                 </th>
             </tr>
         </tfoot>
         </table>
+        <nav class="pagination">
+            <form method="POST" action="/" class="form-horizontal">
+                {% csrf_token %}
+
+                <ul class="pager">
+                    <li>
+                        <a href="#">
+                            <input type="submit" name="get_previous" value="Previous"/>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <input type="submit" name="get_next" value="Next"/>
+                        </a>
+                    </li>
+                </ul>
+
+            </form>
+        </nav>
         </div>
         </div>
     {% endblock %}
