@@ -26,6 +26,14 @@ class MockTest(TestCase):
         self.assertEqual(resp['Location'],
                          'http://testserver' + reverse('login'))
 
+        swiftclient.client.get_account = mock.Mock(
+            return_value=[{}, []],
+            side_effect=swiftclient.client.ClientException(
+                '', http_status=403))
+        resp = self.client.get(reverse('containerview'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue("Container listing failed" in resp.content)
+
         swiftclient.client.get_account = mock.Mock(return_value=[{}, []])
 
         resp = self.client.get(reverse('containerview'))

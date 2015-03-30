@@ -93,8 +93,18 @@ def containerview(request):
             auth_token,
             marker,
             settings.SWIFT_BROWSER_SETTINGS["containers_per_page"])
-    except client.ClientException:
-        return redirect(login)
+    except client.ClientException as exc:
+        if exc.http_status == 403:
+            account_stat = {}
+            containers = []
+            base_url = get_base_url(request)
+            msg = 'Container listing failed. You can manually choose a known '
+            msg += 'container by appending the name to the URL, for example: '
+            msg += '<a href="%s/objects/containername">' % base_url
+            msg += '%s/objects/containername</a>' % base_url
+            messages.add_message(request, messages.ERROR, msg)
+        else:
+            return redirect(login)
 
     # Add the last result to the markers list.
     if len(containers) == 5:
