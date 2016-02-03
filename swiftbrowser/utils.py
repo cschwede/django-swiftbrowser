@@ -107,7 +107,7 @@ def get_temp_url(storage_url, auth_token, container, objectname, expires=600):
     path = "%s/%s/%s" % (url_parts.path, container, objectname)
     base = "%s://%s" % (url_parts.scheme, url_parts.netloc)
     hmac_body = 'GET\n%s\n%s' % (expires, path)
-    sig = hmac.new(key, hmac_body.encode("utf-8"), sha1).hexdigest()
+    sig = hmac.new(str(key), str(hmac_body.encode("utf-8")), sha1).hexdigest()
     url = '%s%s?temp_url_sig=%s&temp_url_expires=%s' % (
         base, path, sig, expires)
     return url
