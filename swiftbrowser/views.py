@@ -53,8 +53,46 @@ def containerview(request):
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
 
+    # "markers" is a list used to keep track of container names for pagination.
+    if "markers" not in request.session:
+
+        # The initial marker with an empty string.
+        request.session["markers"] = ['']
+    marker = ""
+
+    if("get_next" in request.POST):
+
+        # If requesting the next page, and there are none,
+        # the marker should be the last not None marker.
+        if request.session["markers"][-1] is None:
+            request.session["markers"].pop()
+
+        # Use the latest marker to get the next page.
+        marker = request.session["markers"][-1]
+
+    elif ("get_previous" in request.POST):
+
+        # Remove the "next" marker
+        request.session["markers"].pop()
+
+        # Remove the "current" marker if we're not at the very beginning.
+        if len(request.session["markers"]) != 1:
+            request.session["markers"].pop()
+
+        # Use the "previous" marker
+        marker = request.session["markers"][-1]
+
+    else:
+        # Reset marker stack.
+        request.session["markers"] = ['']
+        marker = ""
+
     try:
-        account_stat, containers = client.get_account(storage_url, auth_token)
+        account_stat, containers = client.get_account(
+            storage_url,
+            auth_token,
+            marker,
+            settings.SWIFT_BROWSER_SETTINGS["containers_per_page"])
     except client.ClientException as exc:
         if exc.http_status == 403:
             account_stat = {}
@@ -67,6 +105,17 @@ def containerview(request):
             messages.add_message(request, messages.ERROR, msg)
         else:
             return redirect(login)
+
+    # Add the last result to the markers list.
+    if len(containers) == 5:
+        new_marker = containers[-1]["name"]
+    else:
+        new_marker = None
+
+    request.session["markers"].append(new_marker)
+
+    # Save the session
+    request.session.modified = True
 
     account_stat = replace_hyphens(account_stat)
 

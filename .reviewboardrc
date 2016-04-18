@@ -1,0 +1,4 @@
+REVIEWBOARD_URL = "sand10.scholarsportal.info/reviews"
+REPOSITORY = "Swiftbrowser"
+BRANCH = "master"
+LAND_DEST_BRANCH = "master"
