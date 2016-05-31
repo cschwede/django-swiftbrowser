@@ -4,6 +4,7 @@ import os
 import time
 import urlparse
 import hmac
+import traceback
 from hashlib import sha1
 
 from swiftclient import client
@@ -41,6 +42,7 @@ def login(request):
             return redirect(containerview)
 
         except client.ClientException:
+            traceback.print_exc()
             messages.add_message(request, messages.ERROR, _("Login failed."))
 
     return render_to_response('login.html', {'form': form, },
@@ -56,6 +58,7 @@ def containerview(request):
     try:
         account_stat, containers = client.get_account(storage_url, auth_token)
     except client.ClientException as exc:
+        traceback.print_exc()
         if exc.http_status == 403:
             account_stat = {}
             containers = []
@@ -91,6 +94,7 @@ def create_container(request):
             messages.add_message(request, messages.INFO,
                                  _("Container created."))
         except client.ClientException:
+            traceback.print_exc()
             messages.add_message(request, messages.ERROR, _("Access denied."))
 
         return redirect(containerview)
@@ -113,6 +117,7 @@ def delete_container(request, container):
         client.delete_container(storage_url, auth_token, container)
         messages.add_message(request, messages.INFO, _("Container deleted."))
     except client.ClientException:
+        traceback.print_exc()
         messages.add_message(request, messages.ERROR, _("Access denied."))
 
     return redirect(containerview)
@@ -130,6 +135,7 @@ def objectview(request, container, prefix=None):
                                              prefix=prefix)
 
     except client.ClientException:
+        traceback.print_exc()
         messages.add_message(request, messages.ERROR, _("Access denied."))
         return redirect(containerview)
 
@@ -227,6 +233,7 @@ def delete_object(request, container, objectname):
         client.delete_object(storage_url, auth_token, container, objectname)
         messages.add_message(request, messages.INFO, _("Object deleted."))
     except client.ClientException:
+        traceback.print_exc()
         messages.add_message(request, messages.ERROR, _("Access denied."))
     if objectname[-1] == '/':  # deleting a pseudofolder, move one level up
         objectname = objectname[:-1]
@@ -245,6 +252,7 @@ def toggle_public(request, container):
     try:
         meta = client.head_container(storage_url, auth_token, container)
     except client.ClientException:
+        traceback.print_exc()
         messages.add_message(request, messages.ERROR, _("Access denied."))
         return redirect(containerview)
 
@@ -260,6 +268,7 @@ def toggle_public(request, container):
     try:
         client.post_container(storage_url, auth_token, container, headers)
     except client.ClientException:
+        traceback.print_exc()
         messages.add_message(request, messages.ERROR, _("Access denied."))
 
     return redirect(objectview, container=container)
@@ -274,6 +283,7 @@ def public_objectview(request, account, container, prefix=None):
             storage_url, auth_token, container, delimiter='/', prefix=prefix)
 
     except client.ClientException:
+        traceback.print_exc()
         messages.add_message(request, messages.ERROR, _("Access denied."))
         return redirect(containerview)
 
@@ -348,6 +358,7 @@ def create_pseudofolder(request, container, prefix=None):
             messages.add_message(request, messages.INFO,
                                  _("Pseudofolder created."))
         except client.ClientException:
+            traceback.print_exc()
             messages.add_message(request, messages.ERROR, _("Access denied."))
 
         if prefix:
@@ -407,6 +418,7 @@ def edit_acl(request, container):
                 message = "ACLs updated."
                 messages.add_message(request, messages.INFO, message)
             except client.ClientException:
+                traceback.print_exc()
                 message = "ACL update failed"
                 messages.add_message(request, messages.ERROR, message)
 
@@ -437,6 +449,7 @@ def edit_acl(request, container):
                 message = "ACL removed."
                 messages.add_message(request, messages.INFO, message)
             except client.ClientException:
+                traceback.print_exc()
                 message = "ACL update failed."
                 messages.add_message(request, messages.ERROR, message)
 
