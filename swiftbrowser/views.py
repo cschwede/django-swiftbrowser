@@ -55,6 +55,9 @@ def containerview(request):
     storage_url = request.session.get('storage_url', '')
     auth_token = request.session.get('auth_token', '')
 
+    if not storage_url or not auth_token:
+        return redirect(login)
+
     try:
         account_stat, containers = client.get_account(storage_url, auth_token)
     except client.ClientException as exc:
