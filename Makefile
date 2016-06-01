@@ -1,7 +1,9 @@
-.PHONY  : install run venv
+.PHONY  : all install run venv
 
 VENV        = venv
 SETTINGS    = swiftbrowser.settings
+
+all: install
 
 install: venv
 	$(VENV)/bin/python setup.py install
