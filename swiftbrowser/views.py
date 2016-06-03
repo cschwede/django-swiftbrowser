@@ -187,7 +187,7 @@ def upload(request, container, prefix=None):
 
     hmac_body = '%s\n%s\n%s\n%s\n%s' % (
         path, redirect_url, max_file_size, max_file_count, expires)
-    signature = hmac.new(key, hmac_body, sha1).hexdigest()
+    signature = hmac.new(str(key), str(hmac_body), sha1).hexdigest()
 
     prefixes = prefix_list(prefix)
 
