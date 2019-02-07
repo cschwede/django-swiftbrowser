@@ -1,6 +1,8 @@
 """ Settings for Django project """
 import os
 
+DEBUG = os.environ.get("DEBUG", False)
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 USE_L10N = True
@@ -55,14 +57,15 @@ TEMPLATES = [
     },
 ]
 
-SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'
-SWIFT_AUTH_VERSION = 1  # 2 for keystone
-STORAGE_URL = 'http://127.0.0.1:8080/v1/'
-BASE_URL = 'http://127.0.0.1:8000'  # default if using built-in runserver
+SWIFT_AUTH_URL = os.environ.get(
+    'SWIFT_AUTH_URL', 'http://127.0.0.1:8080/auth/v1.0')
+SWIFT_AUTH_VERSION = os.environ.get('SWIFT_AUTH_VERSION', 1)  # 2 for keystone
+STORAGE_URL = os.environ.get('STORAGE_URL', 'http://127.0.0.1:8080/v1/')
+BASE_URL = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
 TIME_ZONE = 'Europe/Berlin'
 LANGUAGE_CODE = 'de-de'
-SECRET_KEY = 'DONT_USE_THIS_IN_PRODUCTION'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 STATIC_URL = "http://cdnjs.cloudflare.com/ajax/libs/"
 
-ALLOWED_HOSTS = ['127.0.0.1', 'insert_your_hostname_here']
+ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS", "127.0.0.1"), ]
