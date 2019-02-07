@@ -5,7 +5,7 @@ import mock
 import random
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import swiftclient
 import swiftbrowser
@@ -23,8 +23,7 @@ class MockTest(TestCase):
 
         resp = self.client.get(reverse('containerview'))
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'],
-                         'http://testserver' + reverse('login'))
+        self.assertEqual(resp['Location'], reverse('login'))
 
         swiftclient.client.get_account = mock.Mock(
             return_value=[{}, []],
@@ -32,7 +31,7 @@ class MockTest(TestCase):
                 '', http_status=403))
         resp = self.client.get(reverse('containerview'))
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue("Container listing failed" in resp.content)
+        self.assertTrue(b"Container listing failed" in resp.content)
 
         swiftclient.client.get_account = mock.Mock(return_value=[{}, []])
 
@@ -46,7 +45,7 @@ class MockTest(TestCase):
         resp = self.client.post(reverse('create_container'),
                                 {'containername': 'container'})
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/')
+        self.assertEqual(resp['Location'], '/')
 
         swiftclient.client.put_container = mock.Mock()
 
@@ -56,7 +55,7 @@ class MockTest(TestCase):
         resp = self.client.post(reverse('create_container'),
                                 {'containername': 'container'})
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/')
+        self.assertEqual(resp['Location'], '/')
 
     def test_delete_container(self):
         objects = [{'name': 'obj1'}, {'name': 'obj2'}]
@@ -67,7 +66,7 @@ class MockTest(TestCase):
         resp = self.client.post(reverse('delete_container',
                                 kwargs={'container': 'container'}))
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/')
+        self.assertEqual(resp['Location'], '/')
 
         expected = [mock.call('', '', 'container', 'obj1'),
                     mock.call('', '', 'container', 'obj2')]
@@ -78,7 +77,7 @@ class MockTest(TestCase):
         resp = self.client.post(reverse('delete_container',
                                 kwargs={'container': 'container'}))
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/')
+        self.assertEqual(resp['Location'], '/')
 
     def test_objectview(self):
         swiftclient.client.get_container = mock.Mock(
@@ -88,7 +87,7 @@ class MockTest(TestCase):
         resp = self.client.get(reverse('objectview',
                                kwargs={'container': 'container'}))
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/')
+        self.assertEqual(resp['Location'], '/')
 
         meta = {}
         objects = [{'subdir': 'pre'}, {'name': 'pre/fix'}]
@@ -119,8 +118,7 @@ class MockTest(TestCase):
 
         resp = self.client.get(reverse('upload',
                                kwargs={'container': 'container'}))
-        self.assertEqual(resp['Location'],
-                         'http://testserver/objects/container/')
+        self.assertEqual(resp['Location'], '/objects/container/')
 
         account = [{'x-account-meta-temp-url-key': 'dummy'}, ]
         swiftclient.client.get_account = mock.Mock(return_value=(account))
@@ -142,8 +140,7 @@ class MockTest(TestCase):
                                        'container': 'container',
                                        'objectname': 'testfile'}))
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'],
-                         'http://testserver/objects/container/')
+        self.assertEqual(resp['Location'], '/objects/container/')
 
     def test_replace_hyphens(self):
         old = {'test-key': 'test-value'}
@@ -157,7 +154,7 @@ class MockTest(TestCase):
             'username': 'test:tester',
             'password': 'testing'})
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver/')
+        self.assertEqual(resp['Location'], '/')
 
         swiftclient.client.get_auth = mock.Mock(
             side_effect=swiftclient.client.ClientException(''))
@@ -176,8 +173,7 @@ class MockTest(TestCase):
                                        'container': 'container',
                                        'objectname': 'testfile'}))
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'],
-                         'http://testserver/objects/container/')
+        self.assertEqual(resp['Location'], '/objects/container/')
 
         swiftclient.client.delete_object = mock.Mock()
         resp = self.client.get(reverse('delete_object', kwargs={

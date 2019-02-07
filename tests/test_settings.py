@@ -1,4 +1,4 @@
-from swiftbrowser.settings import *
+from swiftbrowser.settings import *  # NOQA
 
 DATABASES = {
     'default': {

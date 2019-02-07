@@ -14,7 +14,7 @@ TEMPLATE_LOADERS = (
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 TEMPLATE_DIRS = (os.path.join(PROJECT_PATH, 'templates'),)
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -31,6 +31,29 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'swiftbrowser',
 )
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            # insert your TEMPLATE_DIRS here
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
+                # list if you haven't customized them:
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 SWIFT_AUTH_URL = 'http://127.0.0.1:8080/auth/v1.0'
 SWIFT_AUTH_VERSION = 1  # 2 for keystone

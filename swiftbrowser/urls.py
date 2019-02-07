@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from swiftbrowser.views import containerview, objectview, download,\
     delete_object, login, tempurl, upload, create_pseudofolder,\
     create_container, delete_container, public_objectview, toggle_public,\
     edit_acl
 
-urlpatterns = patterns(
-    'swiftbrowser.views',
+urlpatterns = (
     url(r'^login/$', login, name="login"),
     url(r'^$', containerview, name="containerview"),
     url(r'^public/(?P<account>.+?)/(?P<container>.+?)/(?P<prefix>(.+)+)?$',

@@ -2,18 +2,17 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-import urlparse
 import hmac
 from hashlib import sha1
+from urllib.parse import urlparse
 
 from swiftclient import client
 
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from swiftbrowser.forms import CreateContainerForm, PseudoFolderForm, \
     LoginForm, AddACLForm
@@ -43,8 +42,7 @@ def login(request):
         except client.ClientException:
             messages.add_message(request, messages.ERROR, _("Login failed."))
 
-    return render_to_response('login.html', {'form': form, },
-                              context_instance=RequestContext(request))
+    return render(request, 'login.html', {'form': form, })
 
 
 def containerview(request):
@@ -70,11 +68,10 @@ def containerview(request):
 
     account_stat = replace_hyphens(account_stat)
 
-    return render_to_response('containerview.html', {
+    return render(request, 'containerview.html', {
         'account_stat': account_stat,
         'containers': containers,
-        'session': request.session,
-    }, context_instance=RequestContext(request))
+        'session': request.session})
 
 
 def create_container(request):
@@ -95,8 +92,7 @@ def create_container(request):
 
         return redirect(containerview)
 
-    return render_to_response(
-        'create_container.html', {}, context_instance=RequestContext(request))
+    return render(request, 'create_container.html', {})
 
 
 def delete_container(request, container):
@@ -144,7 +140,7 @@ def objectview(request, container, prefix=None):
     if [x for x in read_acl if x in required_acl]:
         public = True
 
-    return render_to_response("objectview.html", {
+    return render(request, "objectview.html", {
         'container': container,
         'objects': objs,
         'folders': pseudofolders,
@@ -153,8 +149,7 @@ def objectview(request, container, prefix=None):
         'prefixes': prefixes,
         'base_url': base_url,
         'account': account,
-        'public': public},
-        context_instance=RequestContext(request))
+        'public': public})
 
 
 def upload(request, container, prefix=None):
@@ -171,7 +166,7 @@ def upload(request, container, prefix=None):
         swift_url += prefix
         redirect_url += prefix
 
-    url_parts = urlparse.urlparse(swift_url)
+    url_parts = urlparse(swift_url)
     path = url_parts.path
 
     max_file_size = 5 * 1024 * 1024 * 1024
@@ -187,21 +182,21 @@ def upload(request, container, prefix=None):
 
     hmac_body = '%s\n%s\n%s\n%s\n%s' % (
         path, redirect_url, max_file_size, max_file_count, expires)
-    signature = hmac.new(key, hmac_body, sha1).hexdigest()
+    signature = hmac.new(
+        bytes(key, "utf-8"), bytes(hmac_body, "utf-8"), sha1).hexdigest()
 
     prefixes = prefix_list(prefix)
 
-    return render_to_response('upload_form.html', {
-                              'swift_url': swift_url,
-                              'redirect_url': redirect_url,
-                              'max_file_size': max_file_size,
-                              'max_file_count': max_file_count,
-                              'expires': expires,
-                              'signature': signature,
-                              'container': container,
-                              'prefix': prefix,
-                              'prefixes': prefixes,
-                              }, context_instance=RequestContext(request))
+    return render(request, 'upload_form.html', {
+        'swift_url': swift_url,
+        'redirect_url': redirect_url,
+        'max_file_size': max_file_size,
+        'max_file_count': max_file_count,
+        'expires': expires,
+        'signature': signature,
+        'container': container,
+        'prefix': prefix,
+        'prefixes': prefixes})
 
 
 def download(request, container, objectname):
@@ -268,7 +263,7 @@ def toggle_public(request, container):
 def public_objectview(request, account, container, prefix=None):
     """ Returns list of all objects in current container. """
     storage_url = settings.STORAGE_URL + account
-    auth_token = ' '
+    auth_token = b''
     try:
         _meta, objects = client.get_container(
             storage_url, auth_token, container, delimiter='/', prefix=prefix)
@@ -282,7 +277,7 @@ def public_objectview(request, account, container, prefix=None):
     base_url = get_base_url(request)
     account = storage_url.split('/')[-1]
 
-    return render_to_response("publicview.html", {
+    return render(request, "publicview.html", {
         'container': container,
         'objects': objs,
         'folders': pseudofolders,
@@ -290,8 +285,7 @@ def public_objectview(request, account, container, prefix=None):
         'prefixes': prefixes,
         'base_url': base_url,
         'storage_url': storage_url,
-        'account': account},
-        context_instance=RequestContext(request))
+        'account': account})
 
 
 def tempurl(request, container, objectname):
@@ -312,16 +306,14 @@ def tempurl(request, container, objectname):
         prefix += '/'
     prefixes = prefix_list(prefix)
 
-    return render_to_response('tempurl.html',
-                              {'url': url,
-                               'account': storage_url.split('/')[-1],
-                               'container': container,
-                               'prefix': prefix,
-                               'prefixes': prefixes,
-                               'objectname': objectname,
-                               'session': request.session,
-                               },
-                              context_instance=RequestContext(request))
+    return render(request, 'tempurl.html', {
+        'url': url,
+        'account': storage_url.split('/')[-1],
+        'container': container,
+        'prefix': prefix,
+        'prefixes': prefixes,
+        'objectname': objectname,
+        'session': request.session})
 
 
 def create_pseudofolder(request, container, prefix=None):
@@ -354,10 +346,8 @@ def create_pseudofolder(request, container, prefix=None):
             return redirect(objectview, container=container, prefix=prefix)
         return redirect(objectview, container=container)
 
-    return render_to_response('create_pseudofolder.html', {
-                              'container': container,
-                              'prefix': prefix,
-                              }, context_instance=RequestContext(request))
+    return render(request, 'create_pseudofolder.html', {
+        'container': container, 'prefix': prefix})
 
 
 def get_acls(storage_url, auth_token, container):
@@ -468,11 +458,10 @@ def edit_acl(request, container):
     else:
         base_url = "http://%s" % request.get_host()
 
-    return render_to_response('edit_acl.html', {
+    return render(request, 'edit_acl.html', {
         'container': container,
         'account': storage_url.split('/')[-1],
         'session': request.session,
         'acls': acls,
         'public': public,
-        'base_url': base_url,
-    }, context_instance=RequestContext(request))
+        'base_url': base_url})
