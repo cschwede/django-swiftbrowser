@@ -9,8 +9,3 @@ script:
 
 env:
   - TOXENV=py35-django21
-
-notifications:
- email:
-  recipients:
-   - github@cschwede.de
