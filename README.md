@@ -36,6 +36,27 @@ Quick Install
 4) Open "http://127.0.0.1:8000/" in your browser and use 'account:username' to login (or tenant/project:username if using Keystone).
 
 
+Running with Docker
+-------------------
+
+The included Dockerfile makes running django-swiftbrowser even easier. First
+build the Docker container:
+
+    docker build . -t swiftbrowser
+
+Now run the container and point it to your Swift cluster, eg:
+
+    docker run -d -p 8000:8000 \
+        -e SECRET_KEY=CHANGE_THIS_TO_SOME_RANDOM_VALUE \
+        -e SWIFT_AUTH_VERSION=1 \
+        -e SWIFT_AUTH_URL=http://192.168.2.200:8080/auth/v1.0 \
+        -e STORAGE_URL=http://192.168.2.200:8080/v1 \
+        swiftbrowser
+
+You can also run the tox test environment inside the container:
+
+    docker run swiftbrowser tox
+
 Screenshots
 -----------
 
