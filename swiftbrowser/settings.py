@@ -63,9 +63,9 @@ SWIFT_AUTH_VERSION = os.environ.get('SWIFT_AUTH_VERSION', 1)  # 2 for keystone
 STORAGE_URL = os.environ.get('STORAGE_URL', 'http://127.0.0.1:8080/v1/')
 BASE_URL = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
-TIME_ZONE = 'Europe/Berlin'
-LANGUAGE_CODE = 'de-de'
-SECRET_KEY = os.environ.get("SECRET_KEY")
-STATIC_URL = "http://cdnjs.cloudflare.com/ajax/libs/"
 
+TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Berlin')
+LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'de-de')
+SECRET_KEY = os.environ.get("SECRET_KEY")
+STATIC_URL = "%s://cdnjs.cloudflare.com/ajax/libs/" % (os.environ.get('STATIC_URL_PROTOCOL', 'http'))
 ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS", "127.0.0.1"), ]
